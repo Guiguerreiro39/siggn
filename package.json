@@ -1,12 +1,39 @@
 {
-  "name": "siggo",
+  "name": "@siggo/core",
   "version": "0.0.1",
-  "module": "index.ts",
+  "description": "A lightweight event driven pub/sub system",
+  "keywords": [
+    "pub",
+    "sub",
+    "lightweight",
+    "signals"
+  ],
+  "homepage": "https://github.com/Guiguerreiro39/siggo#readme",
+  "bugs": {
+    "url": "https://github.com/Guiguerreiro39/siggo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Guiguerreiro39/siggo.git"
+  },
+  "license": "ISC",
+  "author": "Guilherme Guerreiro",
   "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "test": "exit 0"
+  },
+  "dependencies": {
+    "bun-types": "^1.3.0",
+    "csstype": "^3.1.3",
+    "typescript": "^5.9.3",
+    "undici-types": "^7.14.0"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
-  }
+  },
+  "module": "index.ts"
 }
