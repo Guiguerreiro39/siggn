@@ -1,4 +1,4 @@
-import { Siggo } from "./siggo";
+import { Siggn } from "./siggn";
 
 type Msg = {
   type: 'increment_count',
@@ -8,28 +8,28 @@ type Msg = {
   value: number
 }
 
-const siggo = new Siggo<Msg>();
+const siggn = new Siggn<Msg>();
 
 let count = 0
 
-siggo.subscribe('1', 'increment_count', (msg) => {
+siggn.subscribe('1', 'increment_count', (msg) => {
   count += msg.value
 })
 
-siggo.subscribe('2', 'decrement_count', (msg) => {
+siggn.subscribe('2', 'decrement_count', (msg) => {
   count -= msg.value
 })
 
-function incrementCount(r: typeof siggo) {
+function incrementCount(r: typeof siggn) {
   r.emit({ type: 'increment_count', value: 4 })
 }
 
-function decrementCount(r: typeof siggo) {
+function decrementCount(r: typeof siggn) {
   r.emit({ type: 'decrement_count', value: 2 })
 }
   
-incrementCount(siggo)
+incrementCount(siggn)
 console.log(count)
 
-decrementCount(siggo)
+decrementCount(siggn)
 console.log(count)

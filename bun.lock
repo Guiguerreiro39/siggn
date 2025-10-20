@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "siggo",
+      "name": "siggn",
       "devDependencies": {
         "@types/bun": "latest",
       },

@@ -1,4 +1,4 @@
-# siggo
+# siggn
 
 To install dependencies:
 

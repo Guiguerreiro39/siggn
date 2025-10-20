@@ -1,1 +1,1 @@
-export * from "./siggo";
+export * from "./siggn";

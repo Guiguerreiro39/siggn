@@ -1,5 +1,5 @@
 {
-  "name": "@siggo/core",
+  "name": "@siggn/core",
   "version": "0.0.1",
   "description": "A lightweight event driven pub/sub system",
   "keywords": [
@@ -8,13 +8,16 @@
     "lightweight",
     "signals"
   ],
-  "homepage": "https://github.com/Guiguerreiro39/siggo#readme",
+  "publishConfig": {
+    "@siggn:registry": "https://npm.pkg.github.com"
+  },
+  "homepage": "https://github.com/Guiguerreiro39/siggn#readme",
   "bugs": {
-    "url": "https://github.com/Guiguerreiro39/siggo/issues"
+    "url": "https://github.com/Guiguerreiro39/siggn/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Guiguerreiro39/siggo.git"
+    "url": "git+https://github.com/Guiguerreiro39/siggn.git"
   },
   "license": "ISC",
   "author": "Guilherme Guerreiro",

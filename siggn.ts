@@ -3,7 +3,7 @@ type Msg = {
   [key: string]: unknown
 }
 
-export class Siggo <T extends Msg> {
+export class Siggn <T extends Msg> {
   private subscriptions: Map<T['type'], Map<string, Function>>
 
   constructor() {
