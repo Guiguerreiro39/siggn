@@ -26,14 +26,17 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "test": "exit 0",
+    "dev": "vitest",
+    "test": "vitest run",
     "build": "tsc",
-    "ci": "pnpm run build",
-    "format": "prettier --write ."
+    "ci": "pnpm run build && pnpm run check-format && pnpm run test",
+    "format": "prettier --write .",
+    "check-format": "prettier --check ."
   },
   "devDependencies": {
     "prettier": "^3.6.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
   "peerDependencies": {
     "typescript": "^5"
