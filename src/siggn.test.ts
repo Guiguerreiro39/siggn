@@ -1,22 +1,24 @@
-import  { Siggn} from "./siggn.js";
-import { test, expect } from "vitest";
+import { Siggn } from './siggn.js';
+import { test, expect } from 'vitest';
 
-type Msg = {
-  type: 'increment_count',
-  value: number
-} | { type: 'decrement_count', value: number}
+type Msg =
+  | {
+      type: 'increment_count';
+      value: number;
+    }
+  | { type: 'decrement_count'; value: number };
 
-test("Siggn", () => {
+test('Siggn', () => {
   const siggn = new Siggn<Msg>();
   let count = 0;
 
   siggn.subscribe('1', 'increment_count', (msg) => {
     count += msg.value;
-  })
+  });
 
   siggn.subscribe('1', 'decrement_count', (msg) => {
     count -= msg.value;
-  })
+  });
 
   siggn.emit({ type: 'increment_count', value: 4 });
 
