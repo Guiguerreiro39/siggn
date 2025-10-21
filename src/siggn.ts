@@ -1,10 +1,10 @@
 type Msg = {
-  type: string
-  [key: string]: unknown
-}
+  type: string;
+  [key: string]: unknown;
+};
 
-export class Siggn <T extends Msg> {
-  private subscriptions: Map<T['type'], Map<string, Function>>
+export class Siggn<T extends Msg> {
+  private subscriptions: Map<T['type'], Map<string, Function>>;
 
   constructor() {
     this.subscriptions = new Map();
@@ -14,7 +14,7 @@ export class Siggn <T extends Msg> {
     if (!this.subscriptions.has(type)) {
       this.subscriptions.set(type, new Map());
     }
-    
+
     this.subscriptions.get(type)?.set(id, callback);
   }
 
