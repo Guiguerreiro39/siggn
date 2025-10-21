@@ -31,9 +31,12 @@
     "build": "tsc",
     "ci": "pnpm run build && pnpm run check-format && pnpm run test",
     "format": "prettier --write .",
-    "check-format": "prettier --check ."
+    "check-format": "prettier --check .",
+    "local-release": "changeset version && changeset publish",
+    "prepublishOnly": "pnpm run ci"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.7",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
