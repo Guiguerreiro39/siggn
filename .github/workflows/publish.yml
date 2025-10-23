@@ -1,26 +1,36 @@
-name: Publish to npm
+name: Release
+
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
-  publish:
+  release:
+    name: Release
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
-      - run: npm ci
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '10'
 
-      - run: npm run build
+      - run: pnpm ci
 
-      - run: npm publish --provenance --access public
+      - name: Create release PR or publish
+        uses: changesets/action@v1
+        with:
+          publish: pnpm run release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

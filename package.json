@@ -1,48 +1,25 @@
 {
-  "name": "@siggn/core",
-  "version": "0.0.2",
-  "description": "A lightweight event driven pub/sub system",
-  "keywords": [
-    "pub/sub",
-    "signals"
-  ],
-  "publishConfig": {
-    "@siggn:registry": "https://registry.npmjs.org/",
-    "access": "public"
-  },
-  "homepage": "https://github.com/Guiguerreiro39/siggn#readme",
-  "bugs": {
-    "url": "https://github.com/Guiguerreiro39/siggn/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Guiguerreiro39/siggn.git"
-  },
-  "files": [
-    "dist"
-  ],
-  "license": "MIT",
-  "author": "Guilherme Guerreiro (https://guilhermegr.com)",
+  "name": "siggn",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Siggn monorepo",
   "type": "module",
-  "main": "dist/index.js",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vitest",
-    "test": "vitest run",
-    "build": "tsc",
-    "ci": "pnpm run build && pnpm run check-format && pnpm run test",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
-    "local-release": "changeset version && changeset publish",
-    "prepublishOnly": "pnpm run ci"
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
-  "types": "index.d.ts"
+  }
 }

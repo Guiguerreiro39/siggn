@@ -1,0 +1,29 @@
+name: Test
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '10'
+      
+      - name: Run build
+        run: pnpm run build
+
+      - name: Check format
+        run: pnpm run check-format
+
+      - name: Run tests
+        run: pnpm run test

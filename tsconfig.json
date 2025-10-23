@@ -1,31 +1,51 @@
 {
   "compilerOptions": {
     /* Base Options: */
-    "esModuleInterop": true,
+    "alwaysStrict": true,
     "skipLibCheck": true,
-    "target": "es2022",
-    "lib": ["es2022"],
     "allowJs": true,
+    "jsx": "react-jsx",
     "resolveJsonModule": true,
     "moduleDetection": "force",
+    "moduleResolution": "node",
+    "module": "commonjs",
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-
-    /* Strictness */
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "lib": [
+      "es2022",
+    ],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "pretty": true,
+    "removeComments": false,
+    "strictPropertyInitialization": false,
+    "target": "es2022",
+    "baseUrl": ".",
 
-    /* If transpiling with TypeScript: */
-    "module": "NodeNext",
-    "outDir": "dist",
-    "rootDir": "src",
-    "sourceMap": true,
-
-    /* AND if you're building for a library: */
-    "declaration": true,
-
-    /* AND if you're building for a library in a monorepo: */
-    "declarationMap": true
-  }
+    "paths": {
+      "@siggn/core": [
+        "./packages/core/src"
+      ],
+      "@siggn/core/*": [
+        "./packages/core/src/*"
+      ]
+    }
+  },
+  "include": [
+    "./examples/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
