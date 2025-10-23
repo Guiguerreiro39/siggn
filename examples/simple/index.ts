@@ -1,38 +1,39 @@
 import { Siggn } from '@siggn/core';
 
-type Msg = {
-  type: "add_value",
-  value: number
-} | {
-  type: "sub_value",
-  value: number
+type Msg =
+  | {
+      type: 'add_value';
+      value: number;
+    }
+  | {
+      type: 'sub_value';
+      value: number;
+    };
 
-}
+export const siggn = new Siggn<Msg>();
 
-export const siggn = new Siggn<Msg>()
+let count = 0;
 
-let count = 0
+siggn.subscribe('1', 'add_value', (msg) => {
+  count += msg.value;
+});
 
-siggn.subscribe("1", "add_value", (msg) => {
-  count += msg.value
-})
-
-siggn.subscribe("2", "sub_value", (msg) => {
-  count -= msg.value
-})
+siggn.subscribe('2', 'sub_value', (msg) => {
+  count -= msg.value;
+});
 
 siggn.publish({
-  type: "add_value",
-  value: 4
-}) 
+  type: 'add_value',
+  value: 4,
+});
 
 // Count should be 4
-console.log(count)
+console.log(count);
 
 siggn.publish({
-  type: "sub_value",
-  value: 2
-})
+  type: 'sub_value',
+  value: 2,
+});
 
 // Count should be 2
-console.log(count)
+console.log(count);

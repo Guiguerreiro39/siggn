@@ -15,9 +15,7 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "lib": [
-      "es2022",
-    ],
+    "lib": ["es2022"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
@@ -33,19 +31,10 @@
     "baseUrl": ".",
 
     "paths": {
-      "@siggn/core": [
-        "./packages/core/src"
-      ],
-      "@siggn/core/*": [
-        "./packages/core/src/*"
-      ]
+      "@siggn/core": ["./packages/core/src"],
+      "@siggn/core/*": ["./packages/core/src/*"]
     }
   },
-  "include": [
-    "./examples/**/*.ts",
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["./examples/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

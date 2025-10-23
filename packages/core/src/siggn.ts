@@ -1,5 +1,4 @@
-import type { Msg, Subscription } from "./types.js";
-
+import type { Msg, Subscription } from './types.js';
 
 export class Siggn<T extends Msg> {
   private subscriptions: Map<T['type'], Array<Subscription<T>>>;
@@ -9,8 +8,8 @@ export class Siggn<T extends Msg> {
   }
 
   makeSubscriptions(id: string): {
-    subscribe: (type: T['type'], callback: (msg: T) => void) => void,
-    unsubscribe: () => void
+    subscribe: (type: T['type'], callback: (msg: T) => void) => void;
+    unsubscribe: () => void;
   } {
     return {
       subscribe: (type, callback) => {
@@ -18,8 +17,8 @@ export class Siggn<T extends Msg> {
       },
       unsubscribe: () => {
         this.unsubscribe(id);
-      }
-    }
+      },
+    };
   }
 
   subscribe(id: string, type: T['type'], callback: (msg: T) => void) {
@@ -42,7 +41,10 @@ export class Siggn<T extends Msg> {
 
   unsubscribe(id: string) {
     for (const [type, subscriptions] of this.subscriptions) {
-      this.subscriptions.set(type, subscriptions.filter((sub) => sub.id !== id));
+      this.subscriptions.set(
+        type,
+        subscriptions.filter((sub) => sub.id !== id),
+      );
     }
   }
 }
