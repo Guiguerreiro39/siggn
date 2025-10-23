@@ -11,6 +11,7 @@
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
     "format": "prettier --write .",
+    "ci": "pnpm -r run ci",
     "check-format": "prettier --check .",
     "changeset": "changeset",
     "version-packages": "changeset version",

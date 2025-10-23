@@ -20,3 +20,19 @@ siggn.subscribe("1", "add_value", (msg) => {
 siggn.subscribe("2", "sub_value", (msg) => {
   count -= msg.value
 })
+
+siggn.publish({
+  type: "add_value",
+  value: 4
+}) 
+
+// Count should be 4
+console.log(count)
+
+siggn.publish({
+  type: "sub_value",
+  value: 2
+})
+
+// Count should be 2
+console.log(count)
