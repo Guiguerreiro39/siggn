@@ -60,7 +60,7 @@ test('user should be able to use makeSubscriptions to subscribe and publish', ()
   const siggn = new Siggn<Msg>();
   let count = 0;
 
-  const subscriptions = siggn.makeSubscriptions('1');
+  const subscriptions = siggn.make('1');
 
   subscriptions.subscribe('increment_count', (msg) => {
     count += msg.value;
@@ -83,7 +83,7 @@ test('user should be able to use makeSubscriptions to unsubscribe', () => {
   const siggn = new Siggn<Msg>();
   let count = 0;
 
-  const subscriptions = siggn.makeSubscriptions('1');
+  const subscriptions = siggn.make('1');
 
   subscriptions.subscribe('increment_count', (msg) => {
     count += msg.value;
@@ -104,6 +104,31 @@ test('user should be able to use makeSubscriptions to unsubscribe', () => {
   subscriptions.unsubscribe();
 
   siggn.publish({ type: 'increment_count', value: 4 });
+
+  expect(count).toBe(2);
+});
+
+test('user should be able to use makeSubscriptions to subscribeMany and publish', () => {
+  const siggn = new Siggn<Msg>();
+  let count = 0;
+
+  const subscriptions = siggn.make('1');
+
+  subscriptions.subscribeMany((subscribe) => {
+    subscribe('increment_count', (msg) => {
+      count += msg.value;
+    });
+
+    subscribe('decrement_count', (msg) => {
+      count -= msg.value;
+    });
+  });
+
+  siggn.publish({ type: 'increment_count', value: 4 });
+
+  expect(count).toBe(4);
+
+  siggn.publish({ type: 'decrement_count', value: 2 });
 
   expect(count).toBe(2);
 });

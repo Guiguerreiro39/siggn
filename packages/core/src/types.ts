@@ -3,7 +3,11 @@ export type Msg = {
   [key: string]: unknown;
 };
 
-export type Subscription<T extends Msg> = {
+export type Subscription<T extends Msg, K extends T['type']> = {
   id: string;
-  callback: (msg: T) => void;
+  callback: (msg: Extract<T, { type: K }>) => void;
+};
+
+export type SubscriptionMap<T extends Msg> = {
+  [K in T['type']]: Array<Subscription<T, K>>;
 };
