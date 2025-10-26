@@ -21,7 +21,7 @@
     "moduleResolution": "nodenext",
     "module": "NodeNext",
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "sourceMap": true,
 
     /* AND if you're building for a library: */
@@ -30,6 +30,6 @@
     /* AND if you're building for a library in a monorepo: */
     "declarationMap": true
   },
-  "include": ["src"],
+  "include": ["src", "tests"],
   "exclude": ["node_modules"]
 }
