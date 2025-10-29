@@ -1,40 +1,11 @@
 {
-  "compilerOptions": {
-    /* Base Options: */
-    "alwaysStrict": true,
-    "skipLibCheck": true,
-    "allowJs": true,
-    "jsx": "react-jsx",
-    "resolveJsonModule": true,
-    "moduleDetection": "force",
-    "moduleResolution": "node",
-    "module": "commonjs",
-    "isolatedModules": true,
-    "allowSyntheticDefaultImports": true,
-    "allowUnreachableCode": false,
-    "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true,
-    "importHelpers": true,
-    "lib": ["es2022"],
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "pretty": true,
-    "removeComments": false,
-    "strictPropertyInitialization": false,
-    "target": "es2022",
-    "baseUrl": ".",
-
-    "paths": {
-      "@siggn/core": ["./packages/core/src"],
-      "@siggn/core/*": ["./packages/core/src/*"]
+  "extends": "./tsconfig.base.json",
+  "references": [
+    {
+      "path": "packages/core"
+    },
+    {
+      "path": "packages/react"
     }
-  },
-  "include": ["./examples/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  ]
 }

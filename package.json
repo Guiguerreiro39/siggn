@@ -1,30 +1,38 @@
 {
-  "name": "siggn",
   "private": true,
-  "version": "0.0.0",
-  "license": "MIT",
-  "description": "Siggn monorepo",
-  "type": "module",
+  "packageManager": "pnpm@10.19.0",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "pnpm tsc -b tsconfig.build.json && pnpm -r run build",
     "test": "pnpm -r run test",
+    "coverage": "vitest --coverage",
     "format": "prettier --write .",
-    "ci": "pnpm -r run ci",
-    "check-format": "prettier --check .",
+    "ci": "pnpm run build && pnpm run check && pnpm run test",
+    "lint": "eslint \"**/{src,test,examples,scripts,dtslint}/**/*.{ts,mjs}\"",
+    "lint-fix": "pnpm lint --fix",
+    "check": "tsc -b tsconfig.json && prettier --check .",
     "changeset": "changeset",
-    "version-packages": "changeset version",
+    "version": "changeset version",
     "release": "changeset publish",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.29.7",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.6",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "eslint": "^9.36.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-codegen": "^0.34.0",
+    "eslint-plugin-deprecation": "^3.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "tsx": "^4.20.6"
   }
 }

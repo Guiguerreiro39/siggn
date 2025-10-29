@@ -1,18 +1,24 @@
-/** @type {import('vite').UserConfig} */
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
 export default defineConfig({
+  resolve: {},
   build: {
     lib: {
       entry: 'src/index.ts',
-      name: '@siggn/core',
-      fileName: 'index',
+      name: '@siggn/react',
       formats: ['es', 'cjs'],
+      fileName: 'index',
     },
     sourcemap: true,
     rollupOptions: {
-      external: [], // add external deps here (e.g., ['react'])
+      // Prevent bundling peer dependencies like React, etc.
+      external: ['react', '@siggn/core'],
+      output: {
+        globals: {
+          react: 'React',
+        },
+      },
     },
   },
   plugins: [
