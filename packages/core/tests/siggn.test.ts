@@ -182,9 +182,9 @@ test('user should be able to use makeSubscriptions to subscribeAll, publish and 
   expect(count).toBe(2);
 });
 
-test('user should be able to create a child instance which inherits the types from the parent', () => {
+test('user should be able to create a clone which inherits the types from the primary instance', () => {
   const parent = new Siggn<Msg>();
-  const child = parent.createChild<Msg1>();
+  const child = parent.createClone<Msg1>();
 
   let count = 0;
 

@@ -1,8 +1,13 @@
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
+import path from 'path';
 
 export default defineConfig({
-  resolve: {},
+  resolve: {
+    alias: {
+      '@siggn/core': path.resolve(__dirname, '../core/src/index.ts'),
+    },
+  },
   build: {
     lib: {
       entry: 'src/index.ts',
@@ -20,6 +25,11 @@ export default defineConfig({
         },
       },
     },
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './vitest.setup.ts',
   },
   plugins: [
     dts({

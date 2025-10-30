@@ -1,6 +1,7 @@
-import type { Msg, Subscription } from './types.js';
+import type { Msg, Subscription, SiggnId } from './types.js';
 
 export class Siggn<T extends Msg> {
+  private nextId = 0;
   private subscriptions: Map<T['type'], Array<Subscription<T, any>>>;
   private subscribeAllSubscriptions: Array<Subscription<T, any>> = [];
 
@@ -8,11 +9,15 @@ export class Siggn<T extends Msg> {
     this.subscriptions = new Map();
   }
 
-  createChild<C extends Msg>() {
+  createClone<C extends Msg>() {
     return new Siggn<C | T>();
   }
 
-  make(id: string): {
+  makeId(id?: string): SiggnId {
+    return id ?? `sub_${(this.nextId++).toString(36)}`;
+  }
+
+  make(id: SiggnId): {
     subscribe: <K extends T['type']>(
       type: K,
       callback: (msg: Extract<T, { type: K }>) => void,
@@ -45,7 +50,7 @@ export class Siggn<T extends Msg> {
   }
 
   subscribeMany(
-    id: string,
+    id: SiggnId,
     setup: (
       subscribe: <K extends T['type']>(
         type: K,
@@ -57,7 +62,7 @@ export class Siggn<T extends Msg> {
   }
 
   subscribe<K extends T['type']>(
-    id: string,
+    id: SiggnId,
     type: K,
     callback: (msg: Extract<T, { type: K }>) => void,
   ) {
@@ -68,7 +73,7 @@ export class Siggn<T extends Msg> {
     this.subscriptions.get(type)?.push({ id, callback });
   }
 
-  subscribeAll(id: string, callback: (msg: T) => void) {
+  subscribeAll(id: SiggnId, callback: (msg: T) => void) {
     this.subscribeAllSubscriptions.push({ id, callback });
   }
 
@@ -86,7 +91,7 @@ export class Siggn<T extends Msg> {
     });
   }
 
-  unsubscribe(id: string) {
+  unsubscribe(id: SiggnId) {
     this.subscribeAllSubscriptions = this.subscribeAllSubscriptions.filter((s) => s.id !== id);
 
     for (const [type, subscriptions] of this.subscriptions) {

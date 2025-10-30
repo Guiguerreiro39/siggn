@@ -11,3 +11,5 @@ export type Subscription<T extends Msg, K extends T['type']> = {
 export type SubscriptionMap<T extends Msg> = {
   [K in T['type']]: Array<Subscription<T, K>>;
 };
+
+export type SiggnId = string;
