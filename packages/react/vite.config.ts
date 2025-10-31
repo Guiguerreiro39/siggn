@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import path from 'path';
 
@@ -11,17 +12,21 @@ export default defineConfig({
   build: {
     lib: {
       entry: 'src/index.ts',
-      name: '@siggn/react',
+      name: 'SiggnReact',
       formats: ['es', 'cjs'],
-      fileName: 'index',
+      fileName: (format) => `index.${format}.js`,
     },
     sourcemap: true,
+    outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
       // Prevent bundling peer dependencies like React, etc.
-      external: ['react', '@siggn/core'],
+      external: ['react', 'react-dom', '@siggn/core'],
       output: {
         globals: {
           react: 'React',
+          'react-dom': 'ReactDOM',
+          '@siggn/core': 'SiggnCore',
         },
       },
     },
@@ -32,7 +37,9 @@ export default defineConfig({
     setupFiles: './vitest.setup.ts',
   },
   plugins: [
+    react(),
     dts({
+      insertTypesEntry: true,
       tsconfigPath: 'tsconfig.build.json',
       outDir: 'dist',
       include: ['src'],

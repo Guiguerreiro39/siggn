@@ -1,6 +1,6 @@
 {
   "name": "@siggn/react",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "A lightweight type safe message bus system for React",
   "keywords": [
     "pub/sub",
@@ -20,20 +20,30 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Guiguerreiro39/siggn.git/",
+    "url": "https://github.com/Guiguerreiro39/siggn.git/",
     "directory": "packages/react"
   },
   "license": "MIT",
   "author": "Guilherme Guerreiro (https://guilhermegr.com)",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/dts/index.d.ts",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "type": "module",
+  "sideEffects": false,
   "scripts": {
+    "dev": "vite build --watch",
+    "clean": "rm -rf dist",
     "test:watch": "vitest",
     "test": "vitest run",
     "build": "vite build",
-    "ci": "pnpm run build && pnpm run check-format && pnpm run test",
+    "ci": "pnpm run build && pnpm run circular && pnpm run check-format && pnpm run test",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "version": "changeset version",
@@ -45,6 +55,7 @@
     "typescript": "^5.9.3",
     "vite": "^7.1.12",
     "vite-plugin-dts": "^4.5.4",
+    "@vitejs/plugin-react": "^5.1.0",
     "vitest": "^3.2.4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -58,6 +69,6 @@
     "react": ">=18 <20"
   },
   "dependencies": {
-    "@siggn/core": "workspace:^"
+    "@siggn/core": "workspace:*"
   }
 }
