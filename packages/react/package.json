@@ -30,11 +30,14 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.cjs.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "sideEffects": false,
   "scripts": {
@@ -43,12 +46,6 @@
     "test:watch": "vitest",
     "test": "vitest run",
     "build": "vite build",
-    "ci": "pnpm run build && pnpm run circular && pnpm run check-format && pnpm run test",
-    "format": "prettier --write .",
-    "check-format": "prettier --check .",
-    "version": "changeset version",
-    "release": "changeset publish",
-    "prepublishOnly": "pnpm run ci",
     "prepack": "pnpm run build"
   },
   "devDependencies": {
