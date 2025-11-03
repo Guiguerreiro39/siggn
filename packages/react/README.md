@@ -1,202 +1,147 @@
-# @siggn/core
+# @siggn/react
 
-A lightweight and type-safe event-driven pub/sub system for TypeScript projects.
+React hooks for `@siggn/core`, providing a simple and idiomatic way to integrate the event bus with your React components.
 
 ## Features
 
-- **Type-Safe**: Leverages TypeScript to ensure that message payloads are correct at compile and
-  runtime.
-- **Lightweight**: Zero dependencies and a minimal API surface.
-- **Simple API**: Easy to learn and use, with a clear and concise API.
+- **Seamless Integration**: Hooks-based API that feels natural in React.
+- **Automatic Cleanup**: Subscriptions are automatically managed throughout the component lifecycle.
+- **Type-Safe**: Full TypeScript support, inheriting the type safety of `@siggn/core`.
 
 ## Installation
 
-You can install the package using your favorite package manager:
+You need to have both `@siggn/core` and `@siggn/react` installed.
 
 ```bash
-npm install @siggn/core
+npm install @siggn/core @siggn/react
 ```
 
 ```bash
-yarn add @siggn/core
+yarn add @siggn/core @siggn/react
 ```
 
 ```bash
-pnpm add @siggn/core
+pnpm add @siggn/core @siggn/react
 ```
 
 ## Usage
 
-Here's a basic example of how to use Siggn:
+The primary way to use `@siggn/react` is by creating a `Siggn` instance and sharing it across your application. You can do this using React Context or by exporting a singleton instance.
+
+### 1. Create a Siggn Instance
+
+It's recommended to create a single `Siggn` instance and share it throughout your app.
 
 ```typescript
+// src/siggn.ts
 import { Siggn } from '@siggn/core';
 
-// 1. Define your message types
-type Message =
-  | { type: 'user_created'; userId: string; name: string }
-  | { type: 'user_deleted'; userId: string };
+// Define your message types
+export type Message =
+  | { type: 'user_login'; name: string }
+  | { type: 'user_logout' };
 
-// 2. Create a new Siggn instance
-const siggn = new Siggn<Message>();
-
-// 3. Subscribe to events
-// Use a unique ID for each subscriber to manage subscriptions
-const subscriberId = 'analytics-service';
-
-siggn.subscribe(subscriberId, 'user_created', (msg) => {
-  console.log(`[Analytics] New user created: ${msg.name} (ID: ${msg.userId})`);
-});
-
-// 4. Publish events
-siggn.publish({ type: 'user_created', userId: '123', name: 'John Doe' });
-// Output: [Analytics] New user created: John Doe (ID: 123)
-
-// 5. Unsubscribe from all events for a given ID
-siggn.unsubscribe(subscriberId);
-
-siggn.publish({ type: 'user_created', userId: '456', name: 'Jane Doe' });
-// No output, because the subscriber was removed.
+// Create and export the instance
+export const siggn = new Siggn<Message>();
 ```
 
-### Using the `make` helper
+Alternatively, you can use the `useSiggn` hook to create a `Siggn` instance that is scoped to a component and its children.
 
-The `make` method simplifies managing subscriptions for a specific component or service.
+### 2. Subscribe to Events in a Component
 
-```typescript
-const userComponent = siggn.make('user-component');
+Use the `useSubscribe` hook to listen for messages. It automatically handles subscribing and unsubscribing.
 
-userComponent.subscribe('user_deleted', (msg) => {
-  console.log(`[UI] User ${msg.userId} was deleted. Updating view...`);
-});
+```tsx
+// src/components/Notification.tsx
+import { useState } from 'react';
+import { useSubscribe } from '@siggn/react';
+import { siggn, type Message } from '../siggn';
 
-siggn.publish({ type: 'user_deleted', userId: '123' });
-// Output: [UI] User 123 was deleted. Updating view...
+function Notification() {
+  const [notification, setNotification] = useState<string | null>(null);
 
-// Unsubscribe from all subscriptions made by 'user-component'
-userComponent.unsubscribe();
-```
+  useSubscribe(siggn, (subscribe) => {
+    subscribe('user_login', (msg) => {
+      setNotification(`Welcome, ${msg.name}!`);
+    });
 
-### Subscribing to multiple events
-
-You can use `subscribeMany` to group subscriptions for a single subscriber.
-
-```typescript
-const auditService = siggn.make('audit-service');
-
-auditService.subscribeMany((subscribe) => {
-  subscribe('user_created', (msg) => {
-    console.log(`[Audit] User created: ${msg.name}`);
+    subscribe('user_logout', () => {
+      setNotification('You have been logged out.');
+    });
   });
-  subscribe('user_deleted', (msg) => {
-    console.log(`[Audit] User deleted: ${msg.userId}`);
+
+  if (!notification) {
+    return null;
+  }
+
+  return <div className='notification'>{notification}</div>;
+}
+```
+
+### 3. Publish Events
+
+You can publish events from anywhere in your application.
+
+```tsx
+// src/components/AuthButton.tsx
+import { siggn } from '../siggn';
+
+function AuthButton({ isLoggedIn }: { isLoggedIn: boolean }) {
+  const handleClick = () => {
+    if (isLoggedIn) {
+      siggn.publish({ type: 'user_logout' });
+    } else {
+      siggn.publish({ type: 'user_login', name: 'Jane Doe' });
+    }
+  };
+
+  return <button onClick={handleClick}>{isLoggedIn ? 'Log Out' : 'Log In'}</button>;
+}
+```
+
+### Using `useSiggn`
+
+The `useSiggn` hook creates a `Siggn` instance that is tied to the component's lifecycle. This can be useful for local, component-specific event buses.
+
+```tsx
+import { useSiggn, useSubscribe } from '@siggn/react';
+
+type LocalMessage = { type: 'local_event' };
+
+function LocalComponent() {
+  const localSiggn = useSiggn<LocalMessage>();
+
+  useSubscribe(localSiggn, (subscribe) => {
+    subscribe('local_event', () => {
+      console.log('Local event received!');
+    });
   });
-});
 
-siggn.publish({ type: 'user_created', userId: '789', name: 'Peter Pan' });
-siggn.publish({ type: 'user_deleted', userId: '123' });
+  const triggerEvent = () => {
+    localSiggn.publish({ type: 'local_event' });
+  };
 
-// Unsubscribe from all audit-service events
-auditService.unsubscribe();
-```
-
-### Subscribing to all events
-
-If you need to listen to every message that passes through the bus, regardless of its type, you can
-use `subscribeAll`. This is useful for cross-cutting concerns like logging or debugging.
-
-```typescript
-const logger = siggn.make('logger-service');
-
-logger.subscribeAll((msg) => {
-  console.log(`[Logger] Received event of type: ${msg.type}`);
-});
-
-siggn.publish({ type: 'user_created', userId: '789', name: 'Peter Pan' });
-// Output: [Logger] Received event of type: user_created
-
-siggn.publish({ type: 'user_deleted', userId: '123' });
-// Output: [Logger] Received event of type: user_deleted
-
-// Unsubscribe from all logger-service events
-logger.unsubscribe();
-```
-
-### Extending message types with `createChild`
-
-The `createChild` method allows you to create a new, independent `Siggn` instance that inherits the
-message types of its parent. This is useful for creating specialized message buses that extend a
-base set of events without affecting the parent bus.
-
-```typescript
-// Continuing with the previous `Message` type...
-const baseSiggn = new Siggn<Message>();
-
-// 1. Define a new set of messages for a specialized module
-type AdminMessage = { type: 'admin_login'; adminId: string };
-
-// 2. Create a child bus that understands both `Message` and `AdminMessage`
-const adminSiggn = baseSiggn.createChild<AdminMessage>();
-
-// 3. Subscribe to events on the child bus
-adminSiggn.subscribe('audit-log', 'user_created', (msg) => {
-  console.log(`[Admin Audit] User created: ${msg.name}`);
-});
-
-adminSiggn.subscribe('auth-service', 'admin_login', (msg) => {
-  console.log(`[Admin Auth] Admin logged in: ${msg.adminId}`);
-});
-
-// 4. Publish events on the child bus
-adminSiggn.publish({ type: 'user_created', userId: 'abc', name: 'Alice' });
-// Output: [Admin Audit] User created: Alice
-
-adminSiggn.publish({ type: 'admin_login', adminId: 'xyz' });
-// Output: [Admin Auth] Admin logged in: xyz
-
-// Note: The parent and child buses are independent.
-// Publishing on the parent does not affect the child's subscribers.
-baseSiggn.publish({ type: 'user_created', userId: 'def', name: 'Bob' });
-// No output, because the subscription is on `adminSiggn`.
+  return <button onClick={triggerEvent}>Trigger Local Event</button>;
+}
 ```
 
 ## API
 
-### `new Siggn<T>()`
+### `useSiggn<T>()`
 
-Creates a new message bus instance. `T` is a union type of all possible messages.
+Creates and returns a `Siggn` instance that persists for the lifetime of the component.
 
-### `publish(msg)`
+- `T`: A union type of all possible messages.
 
-Publishes a message to all relevant subscribers.
+Returns a `Siggn<T>` instance.
 
-### `subscribe(id, type, callback)`
+### `useSubscribe(options, setup, deps)`
 
-Subscribes a callback to a specific message type with a unique subscriber ID.
+Subscribes to messages and automatically unsubscribes when the component unmounts.
 
-### `subscribeAll(id, callback)`
-
-Subscribes a callback to all message types with a unique subscriber ID. The callback will receive
-every message published on the bus.
-
-### `unsubscribe(id)`
-
-Removes all subscriptions associated with a specific subscriber ID.
-
-### `make(id)`
-
-Returns a helper object with `subscribe`, `subscribeMany`, `subscribeAll`, and `unsubscribe` methods
-pre-bound to the provided ID. This is useful for encapsulating subscription logic within a component
-or service.
-
-### `subscribeMany(id, setup)`
-
-A convenience method to subscribe to multiple message types for a single ID.
-
-### `createChild<C>()`
-
-Creates a new, independent `Siggn` instance whose message types are a union of the parent's types
-and the new child-specific types `C`.
+- `options`: A `Siggn` instance or an object `{ instance: Siggn<T>; id?: string; }`.
+- `setup`: A function that receives a `subscribe` helper to define subscriptions, similar to `subscribeMany` in `@siggn/core`.
+- `deps` (optional): A dependency array to control when the subscriptions are re-created.
 
 ## License
 
