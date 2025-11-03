@@ -35,9 +35,6 @@
       "require": "./dist/index.cjs.js"
     }
   },
-  "files": [
-    "dist"
-  ],
   "type": "module",
   "sideEffects": false,
   "scripts": {
