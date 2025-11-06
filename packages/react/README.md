@@ -2,7 +2,7 @@
 
 # @siggn/react
 
-React package for `@siggn/core`, providing a simple and idiomatic way to integrate the event bus with your React components.
+React package for `@siggn/core`, providing a simple and idiomatic way to integrate the message bus with your React components.
 
 ## Features
 
