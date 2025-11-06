@@ -1,6 +1,6 @@
 # @siggn/react
 
-React hooks for `@siggn/core`, providing a simple and idiomatic way to integrate the event bus with your React components.
+React package for `@siggn/core`, providing a simple and idiomatic way to integrate the event bus with your React components.
 
 ## Features
 
@@ -10,18 +10,16 @@ React hooks for `@siggn/core`, providing a simple and idiomatic way to integrate
 
 ## Installation
 
-You need to have both `@siggn/core` and `@siggn/react` installed.
-
 ```bash
-npm install @siggn/core @siggn/react
+npm install @siggn/react
 ```
 
 ```bash
-yarn add @siggn/core @siggn/react
+yarn add @siggn/react
 ```
 
 ```bash
-pnpm add @siggn/core @siggn/react
+pnpm add @siggn/react
 ```
 
 ## Usage
@@ -34,7 +32,7 @@ It's recommended to create a single `Siggn` instance and share it throughout you
 
 ```typescript
 // src/siggn.ts
-import { Siggn } from '@siggn/core';
+import { Siggn } from '@siggn/react';
 
 // Define your message types
 export type Message =
@@ -99,6 +97,24 @@ function AuthButton({ isLoggedIn }: { isLoggedIn: boolean }) {
 }
 ```
 
+### Subscribing to All Events
+
+If you need to listen to all messages, you can use `useSubscribeAll`. This is useful for cross-cutting concerns like logging or analytics.
+
+```tsx
+// src/components/Logger.tsx
+import { useSubscribeAll } from '@siggn/react';
+import { siggn } from '../siggn';
+
+function Logger() {
+  useSubscribeAll(siggn, (msg) => {
+    console.log(`[Logger] Event of type ${msg.type} was triggered`);
+  });
+
+  return null; // This component does not render anything
+}
+```
+
 ### Using `useSiggn`
 
 The `useSiggn` hook creates a `Siggn` instance that is tied to the component's lifecycle. This can be useful for local, component-specific event buses.
@@ -141,6 +157,14 @@ Subscribes to messages and automatically unsubscribes when the component unmount
 
 - `options`: A `Siggn` instance or an object `{ instance: Siggn<T>; id?: string; }`.
 - `setup`: A function that receives a `subscribe` helper to define subscriptions, similar to `subscribeMany` in `@siggn/core`.
+- `deps` (optional): A dependency array to control when the subscriptions are re-created.
+
+### `useSubscribeAll(options, callback, deps)`
+
+Subscribes to all messages and automatically unsubscribes when the component unmounts.
+
+- `options`: A `Siggn` instance or an object `{ instance: Siggn<T>; id?: string; }`.
+- `callback`: A function that will be called with every message.
 - `deps` (optional): A dependency array to control when the subscriptions are re-created.
 
 ## License

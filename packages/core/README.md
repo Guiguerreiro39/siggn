@@ -1,6 +1,6 @@
 # @siggn/core
 
-A lightweight and type-safe event-driven pub/sub system for TypeScript projects.
+A lightweight and type-safe event bus system for TypeScript projects.
 
 ## Features
 
@@ -122,9 +122,9 @@ siggn.publish({ type: 'user_deleted', userId: '123' });
 logger.unsubscribe();
 ```
 
-### Extending message types with `createChild`
+### Extending message types with `createClone`
 
-The `createChild` method allows you to create a new, independent `Siggn` instance that inherits the
+The `createClone` method allows you to create a new, independent `Siggn` instance that inherits the
 message types of its parent. This is useful for creating specialized message buses that extend a
 base set of events without affecting the parent bus.
 
@@ -136,7 +136,7 @@ const baseSiggn = new Siggn<Message>();
 type AdminMessage = { type: 'admin_login'; adminId: string };
 
 // 2. Create a child bus that understands both `Message` and `AdminMessage`
-const adminSiggn = baseSiggn.createChild<AdminMessage>();
+const adminSiggn = baseSiggn.createClone<AdminMessage>();
 
 // 3. Subscribe to events on the child bus
 adminSiggn.subscribe('audit-log', 'user_created', (msg) => {
@@ -164,39 +164,61 @@ baseSiggn.publish({ type: 'user_created', userId: 'def', name: 'Bob' });
 
 ### `new Siggn<T>()`
 
-Creates a new message bus instance. `T` is a union type of all possible messages.
+Creates a new message bus instance.
+
+- `T`: A union type representing all possible messages.
 
 ### `publish(msg)`
 
 Publishes a message to all relevant subscribers.
 
+- `msg`: The message object to be published. It must conform to the `Msg` type.
+
 ### `subscribe(id, type, callback)`
 
-Subscribes a callback to a specific message type with a unique subscriber ID.
+Subscribes a callback to a specific message type.
+
+- `id`: A unique `SiggnId` (string) to identify the subscriber.
+- `type`: The `type` of the message to subscribe to.
+- `callback`: A function that executes when a message of the specified `type` is published. It receives the message as its only argument.
 
 ### `subscribeAll(id, callback)`
 
-Subscribes a callback to all message types with a unique subscriber ID. The callback will receive
-every message published on the bus.
+Subscribes a callback to all message types.
+
+- `id`: A unique `SiggnId` to identify the subscriber.
+- `callback`: A function that executes for every message published. It receives the message as its only argument.
 
 ### `unsubscribe(id)`
 
-Removes all subscriptions associated with a specific subscriber ID.
+Removes all subscriptions (specific and global) associated with a subscriber ID.
+
+- `id`: The `SiggnId` of the subscriber to remove.
+
+### `unsubscribeGlobal(id)`
+
+Removes a global subscription for a given subscriber ID.
+
+- `id`: The `SiggnId` of the global subscriber to remove.
 
 ### `make(id)`
 
-Returns a helper object with `subscribe`, `subscribeMany`, `subscribeAll`, and `unsubscribe` methods
-pre-bound to the provided ID. This is useful for encapsulating subscription logic within a component
-or service.
+Returns a helper object with `subscribe`, `subscribeMany`, `subscribeAll`, and `unsubscribe` methods pre-bound to the provided ID.
+
+- `id`: A `SiggnId` to pre-bind to the subscription methods.
 
 ### `subscribeMany(id, setup)`
 
-A convenience method to subscribe to multiple message types for a single ID.
+Subscribes to multiple message types for a single ID.
 
-### `createChild<C>()`
+- `id`: A `SiggnId` to identify the subscriber.
+- `setup`: A function that receives a `subscribe` helper to register multiple subscriptions under the same `id`.
 
-Creates a new, independent `Siggn` instance whose message types are a union of the parent's types
-and the new child-specific types `C`.
+### `createClone<C>()`
+
+Creates a new, independent `Siggn` instance that inherits the parent's message types and adds new ones.
+
+- `C`: A union type of additional message types for the new instance.
 
 ## License
 

@@ -1,0 +1,7 @@
+{
+  "entryPoints": ["packages/core/src/index.ts", "packages/react/src/index.ts"],
+  "out": "docs",
+  "categorizeByGroup": true,
+  "excludePrivate": true,
+  "includeVersion": true
+}
