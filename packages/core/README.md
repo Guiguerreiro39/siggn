@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/%40siggn%2Fcore.svg)](https://www.npmjs.com/package/%40siggn%2Fcore)
+
 # @siggn/core
 
 A lightweight and type-safe event bus system for TypeScript projects.

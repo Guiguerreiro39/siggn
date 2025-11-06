@@ -10,9 +10,10 @@ This repository hosts the `Siggn` project, a set of tools designed to facilitate
 
 This monorepo contains the following packages:
 
-| Package                          | Description                                              |
-| -------------------------------- | -------------------------------------------------------- |
-| [`@siggn/core`](./packages/core) | A lightweight and type-safe event-driven pub/sub system. |
+| Package                          | Description                                              | NPM
+| -------------------------------- | -------------------------------------------------------- | -------
+| [`@siggn/core`](./packages/core) | A lightweight and type-safe event-driven pub/sub system. | [![npm version](https://badge.fury.io/js/%40siggn%2Fcore.svg)](https://www.npmjs.com/package/%40siggn%2Fcore)
+| [`@siggn/react`](./packages/react) | React hooks for the Siggn event system. | [![npm version](https://badge.fury.io/js/%40siggn%2Freact.svg)](https://www.npmjs.com/package/%40siggn%2Freact)
 
 _(More packages will be added here as they are developed.)_
 
