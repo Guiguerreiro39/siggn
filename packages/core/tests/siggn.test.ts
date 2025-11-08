@@ -1,12 +1,13 @@
 import { Siggn } from '../src/index.js';
-import { test, expect } from 'vitest';
+import { test, expect, describe, beforeAll } from 'vitest';
 
 type Msg =
   | {
       type: 'increment_count';
       value: number;
     }
-  | { type: 'decrement_count'; value: number };
+  | { type: 'decrement_count'; value: number }
+  | { type: 'custom_event' };
 
 type Msg1 = { type: 'reset_count' };
 
@@ -216,3 +217,40 @@ test('user should be able to create a clone which inherits the types from the pr
 
   expect(count).toBe(0);
 });
+
+test.skipIf(typeof global.gc !== 'function')(
+  'should automatically unsubscribe when callback is garbage collected',
+  async () => {
+    function forceGC() {
+      return new Promise<void>((resolve) => {
+        global.gc?.();
+        setImmediate(() => {
+          global.gc?.();
+          resolve();
+        });
+      });
+    }
+
+    const siggn = new Siggn<Msg>();
+
+    const id = siggn.makeId('auto-gc-test');
+
+    let called = false;
+    let callback: ((msg: Msg) => void) | null = (_msg) => {
+      called = true;
+    };
+
+    siggn.subscribe(id, 'custom_event', callback);
+    expect(siggn.subscriptionsCount).toBe(1);
+
+    siggn.publish({ type: 'custom_event' });
+    expect(called).toBe(true);
+
+    callback = null;
+
+    await forceGC();
+    await new Promise((r) => setTimeout(r, 100));
+
+    expect(siggn.subscriptionsCount).toBe(0);
+  },
+);

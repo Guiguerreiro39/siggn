@@ -43,6 +43,7 @@
     "dev": "vite build --watch",
     "clean": "rm -rf dist",
     "test": "vitest run",
+    "test:gc": "NODE_OPTIONS=\"--expose-gc\" pnpx vitest run",
     "build": "vite build",
     "prepack": "pnpm run build"
   },

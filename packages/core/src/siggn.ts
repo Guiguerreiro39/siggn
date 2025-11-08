@@ -11,6 +11,22 @@ export class Siggn<T extends Msg> {
   private globalSubscriptions: Array<Subscription<T, any>> = [];
 
   /**
+   * A FinalizationRegistry to automatically unregister specific subscriptions
+   * when the subscribed callback function is garbage collected.
+   */
+  private readonly registry = new FinalizationRegistry<SiggnId>((id) => {
+    this.unsubscribe(id);
+  });
+
+  /**
+   * A FinalizationRegistry to automatically unregister global subscriptions
+   * when the subscribed callback function is garbage collected.
+   */
+  private readonly registryGlobal = new FinalizationRegistry<SiggnId>((id) => {
+    this.unsubscribeGlobal(id);
+  });
+
+  /**
    * Creates a new Siggn instance.
    * @category Lifecycle
    * @since 0.0.5
@@ -164,7 +180,8 @@ export class Siggn<T extends Msg> {
       this.subscriptions.set(type, []);
     }
 
-    this.subscriptions.get(type)?.push({ id, callback });
+    this.registry.register(callback, id);
+    this.subscriptions.get(type)?.push({ id, ref: new WeakRef(callback) });
   }
 
   /**
@@ -185,7 +202,8 @@ export class Siggn<T extends Msg> {
  * ```
    */
   subscribeAll(id: SiggnId, callback: (msg: T) => void) {
-    this.globalSubscriptions.push({ id, callback });
+    this.registryGlobal.register(callback, id);
+    this.globalSubscriptions.push({ id, ref: new WeakRef(callback) });
   }
 
   /**
@@ -204,7 +222,14 @@ export class Siggn<T extends Msg> {
    */
   publish(msg: T) {
     this.globalSubscriptions.forEach((sub) => {
-      sub.callback(msg as Extract<T, { type: any }>);
+      const fn = sub.ref.deref();
+
+      if (!fn) {
+        this.unsubscribeGlobal(sub.id);
+        return;
+      }
+
+      fn(msg as Extract<T, { type: any }>);
     });
 
     if (!this.subscriptions.has(msg.type)) {
@@ -212,7 +237,14 @@ export class Siggn<T extends Msg> {
     }
 
     this.subscriptions.get(msg.type)?.forEach((sub) => {
-      sub.callback(msg as Extract<T, { type: any }>);
+      const fn = sub.ref.deref();
+
+      if (!fn) {
+        this.unsubscribe(sub.id);
+        return;
+      }
+
+      fn(msg as Extract<T, { type: any }>);
     });
   }
 
@@ -260,5 +292,31 @@ export class Siggn<T extends Msg> {
    */
   unsubscribeGlobal(id: SiggnId) {
     this.globalSubscriptions = this.globalSubscriptions.filter((s) => s.id !== id);
+  }
+
+  /**
+   * Returns the total number of subscriptions (both specific and global).
+   *
+   * @category Subscription
+   * @since 0.0.5
+   * @example
+   * 
+```typescript
+ * const siggn = new Siggn<{ type: 'my-event' }>();
+ * siggn.subscribe('sub-1', 'my-event', () => {});
+ * siggn.subscribeAll('logger', () => {});
+ * console.log(siggn.subscriptionsCount); // 2
+ * ```
+   */
+  get subscriptionsCount() {
+    let count = 0;
+
+    this.subscriptions.forEach((subs) => {
+      count += subs.length;
+    });
+
+    count += this.globalSubscriptions.length;
+
+    return count;
   }
 }

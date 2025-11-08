@@ -162,6 +162,12 @@ baseSiggn.publish({ type: 'user_created', userId: 'def', name: 'Bob' });
 // No output, because the subscription is on `adminSiggn`.
 ```
 
+### Automatic Garbage Collection
+
+Siggn is designed to prevent memory leaks even if subscriptions are not explicitly unsubscribed. It achieves this through the use of `WeakRef` and `FinalizationRegistry`:
+
+While explicit `unsubscribe` calls are still good practice for immediate cleanup and control, Siggn provides a robust safety net against common memory leak scenarios.
+
 ## API
 
 ### `new Siggn<T>()`
@@ -221,6 +227,10 @@ Subscribes to multiple message types for a single ID.
 Creates a new, independent `Siggn` instance that inherits the parent's message types and adds new ones.
 
 - `C`: A union type of additional message types for the new instance.
+
+### `subscriptionsCount()`
+
+Returns the total number of subscriptions.
 
 ## License
 

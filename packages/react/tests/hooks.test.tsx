@@ -134,6 +134,7 @@ describe('@siggn/react', () => {
     act(() => {
       siggn.publish({ type: 'dependency_changed', newValue: 5 });
     });
+
     expect(lastReceivedValue).toBe(25); // 5 + 20
     expect(callCount).toBe(2); // Subscription should have been re-established
   });

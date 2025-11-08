@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, type DependencyList } from 'react';
  * Creates and returns a `Siggn` instance that persists for the lifetime of the component.
  * This is useful for creating a message bus scoped to a component and its children.
  *
- * @template T A union of all possible message types.
+ * @template T A union of all possible message types for the new instance.
  * @returns A `Siggn<T>` instance.
  * @category Lifecycle
  * @since 0.0.1
@@ -20,7 +20,7 @@ import { useEffect, useMemo, useRef, type DependencyList } from 'react';
  * ```
  */
 export function useSiggn<T extends Msg>(): Siggn<T> {
-  const siggn = useRef<Siggn<T>>(new Siggn<T>());
+  const siggn = useRef(new Siggn<T>());
   return siggn.current;
 }
 

@@ -5,7 +5,7 @@ export type Msg = {
 
 export type Subscription<T extends Msg, K extends T['type']> = {
   id: string;
-  callback: (msg: Extract<T, { type: K }>) => void;
+  ref: WeakRef<(msg: Extract<T, { type: K }>) => void>;
 };
 
 export type SubscriptionMap<T extends Msg> = {
