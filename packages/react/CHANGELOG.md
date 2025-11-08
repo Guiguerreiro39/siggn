@@ -1,5 +1,21 @@
 # @siggn/react
 
+## 0.1.0
+
+### Minor Changes
+
+- [`54e3afd`](https://github.com/Guiguerreiro39/siggn/commit/54e3afd430bdb73ef0549ebdfbf9fc6f76bc62b1)
+  Thanks [@Guiguerreiro39](https://github.com/Guiguerreiro39)! - - Introduced automatic garbage
+  collection to prevent memory leaks.
+  - Added code documentation
+  - Added `subscriptionsCount` property to `Siggn`
+
+### Patch Changes
+
+- Updated dependencies
+  [[`54e3afd`](https://github.com/Guiguerreiro39/siggn/commit/54e3afd430bdb73ef0549ebdfbf9fc6f76bc62b1)]:
+  - @siggn/core@0.1.0
+
 ## 0.0.1
 
 ### Patch Changes
