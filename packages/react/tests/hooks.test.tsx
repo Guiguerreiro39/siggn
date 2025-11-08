@@ -1,5 +1,5 @@
-import { test, expect, describe, beforeEach, afterEach } from 'vitest';
-import { useSiggn, useSubscribe } from '../src/hooks.js';
+import { test, expect, describe, beforeEach, afterEach, vi } from 'vitest';
+import { useSiggn, useSubscribe, useSubscribeAll } from '../src/hooks.js';
 import { Siggn } from '@siggn/core';
 import { act, render, renderHook, screen, cleanup } from '@testing-library/react';
 import { useState } from 'react';
@@ -168,5 +168,103 @@ describe('@siggn/react', () => {
 
     // After unmount, the subscription should be gone
     expect(receivedMessage).toBeNull();
+  });
+
+  test('useSubscribeAll should receive all messages', () => {
+    const receivedMessages: Msg[] = [];
+    const callback = vi.fn((msg: Msg) => {
+      receivedMessages.push(msg);
+    });
+
+    function TestComponent() {
+      useSubscribeAll(siggn, callback);
+      return null;
+    }
+
+    render(<TestComponent />);
+
+    act(() => {
+      siggn.publish({ type: 'increment_count', value: 1 });
+      siggn.publish({ type: 'custom_event', data: 'test' });
+    });
+
+    expect(callback).toHaveBeenCalledTimes(2);
+    expect(receivedMessages).toEqual([
+      { type: 'increment_count', value: 1 },
+      { type: 'custom_event', data: 'test' },
+    ]);
+  });
+
+  test('useSubscribeAll should automatically unsubscribe on component unmount', () => {
+    const callback = vi.fn();
+
+    function TestComponent() {
+      useSubscribeAll(siggn, callback);
+      return null;
+    }
+
+    const { unmount } = render(<TestComponent />);
+
+    act(() => {
+      siggn.publish({ type: 'increment_count', value: 1 });
+    });
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    unmount();
+
+    act(() => {
+      siggn.publish({ type: 'custom_event', data: 'after unmount' });
+    });
+
+    expect(callback).toHaveBeenCalledTimes(1); // Should not be called again
+  });
+
+  test('useSubscribeAll should re-subscribe when dependencies change', () => {
+    const callback = vi.fn();
+
+    function TestComponent({ dep }: { dep: number }) {
+      useSubscribeAll(siggn, callback, [dep]);
+      return null;
+    }
+
+    const { rerender } = render(<TestComponent dep={1} />);
+
+    act(() => {
+      siggn.publish({ type: 'increment_count', value: 1 });
+    });
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    rerender(<TestComponent dep={2} />);
+
+    act(() => {
+      siggn.publish({ type: 'increment_count', value: 2 });
+    });
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
+  test('useSubscribeAll should work with explicit id in options', () => {
+    const callback = vi.fn();
+    const customId = 'my-global-subscriber';
+
+    function TestComponent() {
+      useSubscribeAll({ instance: siggn, id: customId }, callback);
+      return null;
+    }
+
+    render(<TestComponent />);
+
+    act(() => {
+      siggn.publish({ type: 'increment_count', value: 1 });
+    });
+    expect(callback).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      siggn.unsubscribeGlobal(customId);
+    });
+
+    act(() => {
+      siggn.publish({ type: 'increment_count', value: 2 });
+    });
+    expect(callback).toHaveBeenCalledTimes(1); // Should not be called again
   });
 });

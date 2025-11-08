@@ -1,4 +1,3 @@
-import effectEslint from "@effect/eslint-plugin";
 import { fixupPluginRules } from "@eslint/compat";
 import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
@@ -28,7 +27,6 @@ export default [
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended"
   ),
-  ...effectEslint.configs.dprint,
   {
     plugins: {
       deprecation,

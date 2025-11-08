@@ -1,5 +1,5 @@
 import { Siggn } from '../src/index.js';
-import { test, expect, describe, beforeAll } from 'vitest';
+import { test, expect } from 'vitest';
 
 type Msg =
   | {
