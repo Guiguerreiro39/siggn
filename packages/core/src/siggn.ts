@@ -298,7 +298,7 @@ export class Siggn<T extends Msg> {
    * Returns the total number of subscriptions (both specific and global).
    *
    * @category Subscription
-   * @since 0.0.5
+   * @since 0.1.0
    * @example
    * 
 ```typescript
