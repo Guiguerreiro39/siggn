@@ -22,12 +22,11 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       // Prevent bundling peer dependencies like React, etc.
-      external: ['react', 'react-dom', '@siggn/core'],
+      external: ['react', 'react-dom'],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
-          '@siggn/core': 'SiggnCore',
         },
       },
     },
