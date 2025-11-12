@@ -1,5 +1,12 @@
 # @siggn/react
 
+## 0.1.1
+
+### Patch Changes
+
+- [`82d7ea7`](https://github.com/Guiguerreiro39/siggn/commit/82d7ea7ac66ef6569760e1d17237c79c5cff750e)
+  Thanks [@Guiguerreiro39](https://github.com/Guiguerreiro39)! - Fix bundling issue
+
 ## 0.1.0
 
 ### Minor Changes
