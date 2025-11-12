@@ -40,15 +40,6 @@
     "dist"
   ],
   "sideEffects": false,
-  "scripts": {
-    "dev": "vite build --watch",
-    "clean": "rm -rf dist",
-    "test:watch": "vitest",
-    "test": "vitest run",
-    "coverage": "vitest run --coverage",
-    "build": "vite build",
-    "prepack": "pnpm run build"
-  },
   "devDependencies": {
     "typescript": "^5.9.3",
     "vite": "^7.1.12",
@@ -67,6 +58,14 @@
     "react": ">=18 <20"
   },
   "dependencies": {
-    "@siggn/core": "workspace:*"
+    "@siggn/core": "0.1.0"
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "clean": "rm -rf dist",
+    "test:watch": "vitest",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "build": "vite build"
   }
 }
