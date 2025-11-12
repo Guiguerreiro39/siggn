@@ -1,5 +1,12 @@
 # @siggn/react
 
+## 0.1.2
+
+### Patch Changes
+
+- [`56e3bb1`](https://github.com/Guiguerreiro39/siggn/commit/56e3bb1118db83dd6a57db611737ab6729660e91)
+  Thanks [@Guiguerreiro39](https://github.com/Guiguerreiro39)! - Fix external exports
+
 ## 0.1.1
 
 ### Patch Changes
