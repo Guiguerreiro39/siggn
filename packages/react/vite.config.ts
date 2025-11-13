@@ -2,14 +2,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
-import path from 'path';
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      '@siggn/core': path.resolve(__dirname, '../core/src/index.ts'),
-    },
-  },
   build: {
     lib: {
       entry: 'src/index.ts',
