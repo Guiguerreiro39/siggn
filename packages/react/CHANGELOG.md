@@ -1,5 +1,12 @@
 # @siggn/react
 
+## 0.1.3
+
+### Patch Changes
+
+- [`e7bbc9a`](https://github.com/Guiguerreiro39/siggn/commit/e7bbc9aadd54bb22130cda1da0cd6f01fe5e383c)
+  Thanks [@Guiguerreiro39](https://github.com/Guiguerreiro39)! - Fix alias import issue
+
 ## 0.1.2
 
 ### Patch Changes
