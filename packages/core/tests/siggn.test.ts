@@ -1,5 +1,5 @@
 import { Siggn } from '../src/index.js';
-import { test, expect } from 'vitest';
+import { test, expect, describe, beforeEach } from 'vitest';
 
 type Msg =
   | {
@@ -11,246 +11,216 @@ type Msg =
 
 type Msg1 = { type: 'reset_count' };
 
-test('user should be able to use subscribe, publish and unsubscribe', () => {
-  const siggn = new Siggn<Msg>();
-  let count = 0;
+describe('Basic usage', () => {
+  let siggn: Siggn<Msg>;
 
-  siggn.subscribe('1', 'increment_count', (msg) => {
-    count += msg.value;
+  beforeEach(() => {
+    siggn = new Siggn<Msg>();
   });
 
-  siggn.subscribe('1', 'decrement_count', (msg) => {
-    count -= msg.value;
-  });
+  test('use subscribe, publish and unsubscribe', () => {
+    let count = 0;
 
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(4);
-
-  siggn.publish({ type: 'decrement_count', value: 2 });
-
-  expect(count).toBe(2);
-
-  siggn.unsubscribe('1');
-
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(2);
-});
-
-test('user should be able to use subscribeMany, publish and unsubscribe', () => {
-  const siggn = new Siggn<Msg>();
-  let count = 0;
-
-  siggn.subscribeMany('1', (subscribe) => {
-    subscribe('increment_count', (msg) => {
+    siggn.subscribe('1', 'increment_count', (msg) => {
       count += msg.value;
     });
 
-    subscribe('decrement_count', (msg) => {
+    siggn.subscribe('1', 'decrement_count', (msg) => {
       count -= msg.value;
     });
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(4);
+
+    siggn.publish({ type: 'decrement_count', value: 2 });
+
+    expect(count).toBe(2);
+
+    siggn.unsubscribe('1');
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(2);
   });
 
-  siggn.publish({ type: 'increment_count', value: 4 });
+  test('use subscribeMany, publish and unsubscribe', () => {
+    let count = 0;
 
-  expect(count).toBe(4);
-
-  siggn.publish({ type: 'decrement_count', value: 2 });
-
-  expect(count).toBe(2);
-
-  siggn.unsubscribe('1');
-
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(2);
-});
-
-test('user should be able to use subscribeAll, publish and unsubscribe', () => {
-  const siggn = new Siggn<Msg>();
-  let count = 0;
-
-  siggn.subscribeAll('1', (msg) => {
-    if (msg.type === 'increment_count') {
-      count += msg.value;
-    } else if (msg.type === 'decrement_count') {
-      count -= msg.value;
-    }
-  });
-
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(4);
-
-  siggn.publish({ type: 'decrement_count', value: 2 });
-
-  expect(count).toBe(2);
-
-  siggn.unsubscribe('1');
-
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(2);
-});
-
-test('user should be able to use makeSubscriptions to subscribe, publish and unsubscribe', () => {
-  const siggn = new Siggn<Msg>();
-  let count = 0;
-
-  const subscriptions = siggn.make('1');
-
-  subscriptions.subscribe('increment_count', (msg) => {
-    count += msg.value;
-  });
-
-  subscriptions.subscribe('decrement_count', (msg) => {
-    count -= msg.value;
-  });
-
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(4);
-
-  siggn.publish({ type: 'decrement_count', value: 2 });
-
-  expect(count).toBe(2);
-
-  subscriptions.unsubscribe();
-
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(2);
-});
-
-test('user should be able to use makeSubscriptions to subscribeMany, publish and unsubscribe', () => {
-  const siggn = new Siggn<Msg>();
-  let count = 0;
-
-  const subscriptions = siggn.make('1');
-
-  subscriptions.subscribeMany((subscribe) => {
-    subscribe('increment_count', (msg) => {
-      count += msg.value;
-    });
-
-    subscribe('decrement_count', (msg) => {
-      count -= msg.value;
-    });
-  });
-
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(4);
-
-  siggn.publish({ type: 'decrement_count', value: 2 });
-
-  expect(count).toBe(2);
-
-  subscriptions.unsubscribe();
-
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(2);
-});
-
-test('user should be able to use makeSubscriptions to subscribeAll, publish and unsubscribe', () => {
-  const siggn = new Siggn<Msg>();
-  let count = 0;
-
-  const subscriptions = siggn.make('1');
-
-  subscriptions.subscribeAll((msg) => {
-    if (msg.type === 'increment_count') {
-      count += msg.value;
-    } else if (msg.type === 'decrement_count') {
-      count -= msg.value;
-    }
-  });
-
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(4);
-
-  siggn.publish({ type: 'decrement_count', value: 2 });
-
-  expect(count).toBe(2);
-
-  subscriptions.unsubscribe();
-
-  siggn.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(2);
-});
-
-test('user should be able to create a clone which inherits the types from the primary instance', () => {
-  const parent = new Siggn<Msg>();
-  const child = parent.createClone<Msg1>();
-
-  let count = 0;
-
-  child.subscribe('1', 'increment_count', (msg) => {
-    count += msg.value;
-  });
-
-  child.subscribe('1', 'decrement_count', (msg) => {
-    count -= msg.value;
-  });
-
-  child.subscribe('1', 'reset_count', () => {
-    count = 0;
-  });
-
-  child.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(4);
-
-  child.publish({ type: 'decrement_count', value: 2 });
-
-  expect(count).toBe(2);
-
-  child.publish({ type: 'reset_count' });
-
-  expect(count).toBe(0);
-
-  parent.publish({ type: 'increment_count', value: 4 });
-
-  expect(count).toBe(0);
-});
-
-test.skipIf(typeof global.gc !== 'function')(
-  'should automatically unsubscribe when callback is garbage collected',
-  async () => {
-    function forceGC() {
-      return new Promise<void>((resolve) => {
-        global.gc?.();
-        setImmediate(() => {
-          global.gc?.();
-          resolve();
-        });
+    siggn.subscribeMany('1', (subscribe) => {
+      subscribe('increment_count', (msg) => {
+        count += msg.value;
       });
-    }
 
-    const siggn = new Siggn<Msg>();
+      subscribe('decrement_count', (msg) => {
+        count -= msg.value;
+      });
+    });
 
-    const id = siggn.makeId('auto-gc-test');
+    siggn.publish({ type: 'increment_count', value: 4 });
 
-    let called = false;
-    let callback: ((msg: Msg) => void) | null = (_msg) => {
-      called = true;
-    };
+    expect(count).toBe(4);
 
-    siggn.subscribe(id, 'custom_event', callback);
-    expect(siggn.subscriptionsCount).toBe(1);
+    siggn.publish({ type: 'decrement_count', value: 2 });
 
-    siggn.publish({ type: 'custom_event' });
-    expect(called).toBe(true);
+    expect(count).toBe(2);
 
-    callback = null;
+    siggn.unsubscribe('1');
 
-    await forceGC();
-    await new Promise((r) => setTimeout(r, 100));
+    siggn.publish({ type: 'increment_count', value: 4 });
 
-    expect(siggn.subscriptionsCount).toBe(0);
-  },
-);
+    expect(count).toBe(2);
+  });
+
+  test('use subscribeAll, publish and unsubscribe', () => {
+    let count = 0;
+
+    siggn.subscribeAll('1', (msg) => {
+      if (msg.type === 'increment_count') {
+        count += msg.value;
+      } else if (msg.type === 'decrement_count') {
+        count -= msg.value;
+      }
+    });
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(4);
+
+    siggn.publish({ type: 'decrement_count', value: 2 });
+
+    expect(count).toBe(2);
+
+    siggn.unsubscribe('1');
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(2);
+  });
+
+  test('use makeSubscriptions to subscribe, publish and unsubscribe', () => {
+    let count = 0;
+
+    const subscriptions = siggn.make('1');
+
+    subscriptions.subscribe('increment_count', (msg) => {
+      count += msg.value;
+    });
+
+    subscriptions.subscribe('decrement_count', (msg) => {
+      count -= msg.value;
+    });
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(4);
+
+    siggn.publish({ type: 'decrement_count', value: 2 });
+
+    expect(count).toBe(2);
+
+    subscriptions.unsubscribe();
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(2);
+  });
+
+  test('use makeSubscriptions to subscribeMany, publish and unsubscribe', () => {
+    let count = 0;
+
+    const subscriptions = siggn.make('1');
+
+    subscriptions.subscribeMany((subscribe) => {
+      subscribe('increment_count', (msg) => {
+        count += msg.value;
+      });
+
+      subscribe('decrement_count', (msg) => {
+        count -= msg.value;
+      });
+    });
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(4);
+
+    siggn.publish({ type: 'decrement_count', value: 2 });
+
+    expect(count).toBe(2);
+
+    subscriptions.unsubscribe();
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(2);
+  });
+
+  test('use makeSubscriptions to subscribeAll, publish and unsubscribe', () => {
+    let count = 0;
+
+    const subscriptions = siggn.make('1');
+
+    subscriptions.subscribeAll((msg) => {
+      if (msg.type === 'increment_count') {
+        count += msg.value;
+      } else if (msg.type === 'decrement_count') {
+        count -= msg.value;
+      }
+    });
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(4);
+
+    siggn.publish({ type: 'decrement_count', value: 2 });
+
+    expect(count).toBe(2);
+
+    subscriptions.unsubscribe();
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(2);
+  });
+
+  test('create a clone which inherits the types from the primary instance', () => {
+    const child = siggn.createClone<Msg1>();
+
+    let count = 0;
+
+    child.subscribe('1', 'increment_count', (msg) => {
+      count += msg.value;
+    });
+
+    child.subscribe('1', 'decrement_count', (msg) => {
+      count -= msg.value;
+    });
+
+    child.subscribe('1', 'reset_count', () => {
+      count = 0;
+    });
+
+    child.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(4);
+
+    child.publish({ type: 'decrement_count', value: 2 });
+
+    expect(count).toBe(2);
+
+    child.publish({ type: 'reset_count' });
+
+    expect(count).toBe(0);
+
+    siggn.publish({ type: 'increment_count', value: 4 });
+
+    expect(count).toBe(0);
+  });
+});
+
+// describe('Middleware', () => {
+//   test('use global middleware', () => {
+//     const siggn = new Siggn<Msg>();
+//   })
+// })

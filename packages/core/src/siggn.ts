@@ -1,30 +1,15 @@
-import type { Msg, Subscription, SiggnId } from './types.js';
+import type { Msg, Subscription, SiggnId, Middleware } from './types.js';
 
 /**
  * A type-safe message bus for dispatching and subscribing to events.
  * @template T A union of all possible message types.
  * @since 0.0.5
  */
-export class Siggn<T extends Msg> {
+export class Siggn<M extends Msg> {
   private nextId = 0;
-  private subscriptions: Map<T['type'], Array<Subscription<T, any>>>;
-  private globalSubscriptions: Array<Subscription<T, any>> = [];
-
-  /**
-   * A FinalizationRegistry to automatically unregister specific subscriptions
-   * when the subscribed callback function is garbage collected.
-   */
-  private readonly registry = new FinalizationRegistry<SiggnId>((id) => {
-    this.unsubscribe(id);
-  });
-
-  /**
-   * A FinalizationRegistry to automatically unregister global subscriptions
-   * when the subscribed callback function is garbage collected.
-   */
-  private readonly registryGlobal = new FinalizationRegistry<SiggnId>((id) => {
-    this.unsubscribeGlobal(id);
-  });
+  private subscriptions: Map<M['type'], Array<Subscription<M, any>>>;
+  private globalSubscriptions: Array<Subscription<M, any>>;
+  private middlewares: Middleware<M>[];
 
   /**
    * Creates a new Siggn instance.
@@ -33,6 +18,12 @@ export class Siggn<T extends Msg> {
    */
   constructor() {
     this.subscriptions = new Map();
+    this.globalSubscriptions = [];
+    this.middlewares = [];
+  }
+
+  use(mw: Middleware<M>) {
+    this.middlewares.push(mw);
   }
 
   /**
@@ -52,7 +43,7 @@ export class Siggn<T extends Msg> {
  * ```
    */
   createClone<C extends Msg>() {
-    return new Siggn<C | T>();
+    return new Siggn<M | C>();
   }
 
   /**
@@ -94,20 +85,20 @@ export class Siggn<T extends Msg> {
  * ```
    */
   make(id: SiggnId): {
-    subscribe: <K extends T['type']>(
-      type: K,
-      callback: (msg: Extract<T, { type: K }>) => void,
+    subscribe: <T extends M['type']>(
+      type: T,
+      callback: (msg: Extract<M, { type: T }>) => void,
     ) => void;
     unsubscribe: () => void;
     subscribeMany: (
       setup: (
-        subscribe: <K extends T['type']>(
-          type: K,
-          callback: (msg: Extract<T, { type: K }>) => void,
+        subscribe: <T extends M['type']>(
+          type: T,
+          callback: (msg: Extract<M, { type: T }>) => void,
         ) => void,
       ) => void,
     ) => void;
-    subscribeAll: (callback: (msg: T) => void) => void;
+    subscribeAll: (callback: (msg: M) => void) => void;
   } {
     return {
       subscribe: (type, callback) => {
@@ -145,9 +136,9 @@ export class Siggn<T extends Msg> {
   subscribeMany(
     id: SiggnId,
     setup: (
-      subscribe: <K extends T['type']>(
-        type: K,
-        callback: (msg: Extract<T, { type: K }>) => void,
+      subscribe: <T extends M['type']>(
+        type: T,
+        callback: (msg: Extract<M, { type: T }>) => void,
       ) => void,
     ) => void,
   ) {
@@ -171,17 +162,16 @@ export class Siggn<T extends Msg> {
  * });
  * ```
    */
-  subscribe<K extends T['type']>(
+  subscribe<T extends M['type']>(
     id: SiggnId,
-    type: K,
-    callback: (msg: Extract<T, { type: K }>) => void,
+    type: T,
+    callback: (msg: Extract<M, { type: T }>) => void,
   ) {
     if (!this.subscriptions.has(type)) {
       this.subscriptions.set(type, []);
     }
 
-    this.registry.register(callback, id);
-    this.subscriptions.get(type)?.push({ id, ref: new WeakRef(callback) });
+    this.subscriptions.get(type)?.push({ id, ref: callback });
   }
 
   /**
@@ -201,9 +191,8 @@ export class Siggn<T extends Msg> {
  * });
  * ```
    */
-  subscribeAll(id: SiggnId, callback: (msg: T) => void) {
-    this.registryGlobal.register(callback, id);
-    this.globalSubscriptions.push({ id, ref: new WeakRef(callback) });
+  subscribeAll(id: SiggnId, callback: (msg: M) => void) {
+    this.globalSubscriptions.push({ id, ref: callback });
   }
 
   /**
@@ -220,16 +209,9 @@ export class Siggn<T extends Msg> {
  * siggn.publish({ type: 'my-event' }); // "received"
  * ```
    */
-  publish(msg: T) {
+  publish(msg: M) {
     this.globalSubscriptions.forEach((sub) => {
-      const fn = sub.ref.deref();
-
-      if (!fn) {
-        this.unsubscribeGlobal(sub.id);
-        return;
-      }
-
-      fn(msg as Extract<T, { type: any }>);
+      sub.ref(msg as Extract<M, { type: any }>);
     });
 
     if (!this.subscriptions.has(msg.type)) {
@@ -237,14 +219,7 @@ export class Siggn<T extends Msg> {
     }
 
     this.subscriptions.get(msg.type)?.forEach((sub) => {
-      const fn = sub.ref.deref();
-
-      if (!fn) {
-        this.unsubscribe(sub.id);
-        return;
-      }
-
-      fn(msg as Extract<T, { type: any }>);
+      sub.ref(msg as Extract<M, { type: any }>);
     });
   }
 
@@ -292,31 +267,5 @@ export class Siggn<T extends Msg> {
    */
   unsubscribeGlobal(id: SiggnId) {
     this.globalSubscriptions = this.globalSubscriptions.filter((s) => s.id !== id);
-  }
-
-  /**
-   * Returns the total number of subscriptions (both specific and global).
-   *
-   * @category Subscription
-   * @since 0.1.0
-   * @example
-   * 
-```typescript
- * const siggn = new Siggn<{ type: 'my-event' }>();
- * siggn.subscribe('sub-1', 'my-event', () => {});
- * siggn.subscribeAll('logger', () => {});
- * console.log(siggn.subscriptionsCount); // 2
- * ```
-   */
-  get subscriptionsCount() {
-    let count = 0;
-
-    this.subscriptions.forEach((subs) => {
-      count += subs.length;
-    });
-
-    count += this.globalSubscriptions.length;
-
-    return count;
   }
 }

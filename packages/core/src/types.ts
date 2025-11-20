@@ -3,9 +3,9 @@ export type Msg = {
   [key: string]: unknown;
 };
 
-export type Subscription<T extends Msg, K extends T['type']> = {
+export type Subscription<M extends Msg, T extends M['type']> = {
   id: string;
-  ref: WeakRef<(msg: Extract<T, { type: K }>) => void>;
+  ref: (msg: Extract<M, { type: T }>) => void;
 };
 
 export type SubscriptionMap<T extends Msg> = {
@@ -13,3 +13,5 @@ export type SubscriptionMap<T extends Msg> = {
 };
 
 export type SiggnId = string;
+
+export type Middleware<M extends Msg> = (msg: M, next: () => void) => void | Promise<void>;

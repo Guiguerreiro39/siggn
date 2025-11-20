@@ -1,6 +1,6 @@
 import { type Msg, Siggn } from '@siggn/core';
 import type { SubscriptionOptions } from 'packages/react/src/types';
-import { useEffect, useMemo, useRef, type DependencyList } from 'react';
+import { useEffect, useMemo, useState, type DependencyList } from 'react';
 
 /**
  * Creates and returns a `Siggn` instance that persists for the lifetime of the component.
@@ -20,12 +20,12 @@ import { useEffect, useMemo, useRef, type DependencyList } from 'react';
  * ```
  */
 export function useSiggn<T extends Msg>(): Siggn<T> {
-  const siggn = useRef(new Siggn<T>());
-  return siggn.current;
+  const [siggn] = useState(new Siggn<T>());
+  return siggn;
 }
 
 /**
- * Subscribes to messages and automatically unsubscribes when the component unmounts.
+ * Subscribes to multiple messages and automatically unsubscribes when the component unmounts.
  *
  * @template T A union of all possible message types.
  * @param options A `Siggn` instance or an object with the instance and an optional subscriber ID.
@@ -39,19 +39,20 @@ export function useSiggn<T extends Msg>(): Siggn<T> {
  * import { siggn } from './siggn'; // Your shared instance
  *
  * function MyComponent() {
- *   useSubscribe(siggn, (subscribe) => {
+ *   useSubscribeMany(siggn, (subscribe) => {
  *     subscribe('user-created', (msg) => console.log(msg.name));
+ *     subscribe('user-updated', (msg) => console.log(msg.name));
  *   });
  *   // ...
  * }
  * ```
  */
-export function useSubscribe<T extends Msg>(
-  options: SubscriptionOptions<T>,
+export function useSubscribeMany<M extends Msg>(
+  options: SubscriptionOptions<M>,
   setup: (
-    subscribe: <K extends T['type']>(
-      type: K,
-      callback: (msg: Extract<T, { type: K }>) => void,
+    subscribe: <T extends M['type']>(
+      type: T,
+      callback: (msg: Extract<M, { type: T }>) => void,
     ) => void,
   ) => void,
   deps: DependencyList = [],
@@ -64,6 +65,47 @@ export function useSubscribe<T extends Msg>(
 
   useEffect(() => {
     instance.subscribeMany(id, setup);
+
+    return () => {
+      instance.unsubscribe(id);
+    };
+  }, [instance, id, ...deps]);
+}
+
+/**
+ * Subscribes to a single message and automatically unsubscribe when the component unmounts.
+ *
+ * @template T A union of all possible message types.
+ * @param options A `Siggn` instance or an object with the instance and an optional subscriber ID.
+ * @param setup A function that receives a `subscribe` helper to define subscriptions.
+ * @param deps An optional dependency array to control when the subscriptions are re-created.
+ * @category Subscription
+ * @since 0.0.1
+ * @example
+ * 
+```tsx
+ * import { siggn } from './siggn'; // Your shared instance
+ *
+ * function MyComponent() {
+ *   useSubscribe(siggn, 'user-created', (msg) => console.log(msg.name));
+ *   // ...
+ * }
+ * ```
+ */
+export function useSubscribe<M extends Msg, T extends M['type']>(
+  options: SubscriptionOptions<M>,
+  type: T,
+  callback: (msg: Extract<M, { type: T }>) => void,
+  deps: DependencyList = [],
+) {
+  const instance = useMemo(
+    () => (options instanceof Siggn ? options : options.instance),
+    [options],
+  );
+  const id = useMemo(() => instance.makeId('id' in options ? options.id : undefined), [instance]);
+
+  useEffect(() => {
+    instance.subscribe(id, type, callback);
 
     return () => {
       instance.unsubscribe(id);
