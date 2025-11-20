@@ -1,6 +1,6 @@
 import { test, expect, describe, beforeEach, afterEach, vi } from 'vitest';
-import { useSiggn, useSubscribe, useSubscribeAll } from '../src/hooks.js';
-import { Siggn } from '@siggn/core';
+import { useSiggn, useSubscribe, useSubscribeAll, useSubscribeMany } from '../src/hooks.js';
+import type { Siggn } from '@siggn/core';
 import { act, render, renderHook, screen, cleanup } from '@testing-library/react';
 import { useState } from 'react';
 
@@ -25,11 +25,11 @@ describe('@siggn/react', () => {
     cleanup();
   });
 
-  test('user should be able to create a siggn instance and subscribe using hooks', () => {
+  test('user should be able to create a siggn instance and subscribe using useSubscribeMany hook', () => {
     function TestComponent() {
       const [count, setCount] = useState(0);
 
-      useSubscribe(siggn, (subscribe) => {
+      useSubscribeMany(siggn, (subscribe) => {
         subscribe('increment_count', (msg) => {
           setCount((prev) => prev + msg.value);
         });
@@ -59,8 +59,40 @@ describe('@siggn/react', () => {
     expect(screen.getByTestId('value')).toHaveTextContent('2');
   });
 
+  test('user should be able to create a siggn instance and subscribe using useSubscribe hook', () => {
+    function TestComponent() {
+      const [count, setCount] = useState(0);
+
+      useSubscribe(siggn, 'increment_count', (msg) => {
+        setCount((prev) => prev + msg.value);
+      });
+
+      useSubscribe(siggn, 'decrement_count', (msg) => {
+        setCount((prev) => prev - msg.value);
+      });
+
+      return <div data-testid='value'>{count}</div>;
+    }
+
+    render(<TestComponent />);
+
+    expect(screen.getByTestId('value')).toHaveTextContent('0');
+
+    act(() => {
+      siggn.publish({ type: 'increment_count', value: 4 });
+    });
+
+    expect(screen.getByTestId('value')).toHaveTextContent('4');
+
+    act(() => {
+      siggn.publish({ type: 'decrement_count', value: 2 });
+    });
+
+    expect(screen.getByTestId('value')).toHaveTextContent('2');
+  });
+
   test('useSiggn should return a stable instance across re-renders', () => {
-    const { result, rerender } = renderHook(() => useSiggn<Msg>());
+    const { rerender, result } = renderHook(() => useSiggn<Msg>());
     const firstInstance = result.current;
 
     rerender(); // Re-render the hook
@@ -74,7 +106,7 @@ describe('@siggn/react', () => {
     const customId = 'my-custom-subscriber';
 
     function TestComponent() {
-      useSubscribe({ instance: siggn, id: customId }, (subscribe) => {
+      useSubscribeMany({ instance: siggn, id: customId }, (subscribe) => {
         subscribe('custom_event', (msg) => {
           receivedData = msg.data;
         });
@@ -108,7 +140,7 @@ describe('@siggn/react', () => {
     let lastReceivedValue = 0;
 
     function TestComponent({ depValue }: { depValue: number }) {
-      useSubscribe(
+      useSubscribeMany(
         siggn,
         (subscribe) => {
           callCount++; // This should increment when subscription is re-established
@@ -143,7 +175,7 @@ describe('@siggn/react', () => {
     let receivedMessage: string | null = null;
 
     function TestComponent() {
-      useSubscribe(siggn, (subscribe) => {
+      useSubscribeMany(siggn, (subscribe) => {
         subscribe('custom_event', (msg) => {
           receivedMessage = msg.data;
         });

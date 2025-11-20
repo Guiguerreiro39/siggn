@@ -1,9 +1,9 @@
-import { useSubscribe } from '@siggn/react';
+import { useSubscribeMany } from '@siggn/react';
 import { siggn } from '@/siggn';
 import { toast } from 'sonner';
 
 export function NotificationHandler() {
-  useSubscribe(siggn, (subscribe) => {
+  useSubscribeMany(siggn, (subscribe) => {
     subscribe('SHOW_NOTIFICATION', (msg) => {
       switch (msg.variant) {
         case 'success':

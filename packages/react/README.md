@@ -49,7 +49,7 @@ Alternatively, you can use the `useSiggn` hook to create a `Siggn` instance that
 
 ### 2. Subscribe to Events in a Component
 
-Use the `useSubscribe` hook to listen for messages. It automatically handles subscribing and unsubscribing.
+Use the `useSubscribe` hook to listen for a message. It automatically handles subscribing and unsubscribing.
 
 ```tsx
 // src/components/Notification.tsx
@@ -60,7 +60,30 @@ import { siggn, type Message } from '../siggn';
 function Notification() {
   const [notification, setNotification] = useState<string | null>(null);
 
-  useSubscribe(siggn, (subscribe) => {
+  useSubscribe(siggn, 'user_login', (msg) => {
+    setNotification(`Welcome, ${msg.name}!`);
+  });
+
+  if (!notification) {
+    return null;
+  }
+
+  return <div className='notification'>{notification}</div>;
+}
+```
+
+You can also use the `useSubscribeMany` hook to listen for multiple messages. It automatically handles subscribing and unsubscribing.
+
+```tsx
+// src/components/Notification.tsx
+import { useState } from 'react';
+import { useSubscribeMany } from '@siggn/react';
+import { siggn, type Message } from '../siggn';
+
+function Notification() {
+  const [notification, setNotification] = useState<string | null>(null);
+
+  useSubscribeMany(siggn, (subscribe) => {
     subscribe('user_login', (msg) => {
       setNotification(`Welcome, ${msg.name}!`);
     });

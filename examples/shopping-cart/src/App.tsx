@@ -6,13 +6,13 @@ import { Toaster } from '@/components/ui/sonner';
 import { Navbar } from '@/components/Navbar';
 import { CheckoutPage } from '@/components/CheckoutPage';
 import { SuccessPage } from '@/components/SuccessPage';
-import { useSubscribe } from '@siggn/react';
+import { useSubscribeMany } from '@siggn/react';
 import { siggn } from '@/siggn';
 
 function App() {
   const [page, setPage] = useState('home');
 
-  useSubscribe(siggn, (subscribe) => {
+  useSubscribeMany(siggn, (subscribe) => {
     subscribe('NAVIGATE_TO_CHECKOUT', () => setPage('checkout'));
     subscribe('NAVIGATE_TO_SUCCESS', () => setPage('success'));
     subscribe('NAVIGATE_TO_HOME', () => setPage('home'));
