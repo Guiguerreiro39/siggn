@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSubscribe } from '@siggn/react';
+import { useSubscribeMany } from '@siggn/react';
 import { siggn, type CartItem } from '@/siggn';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -10,7 +10,7 @@ export function Navbar() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [username, setUsername] = useState('Guest');
 
-  useSubscribe(siggn, (subscribe) => {
+  useSubscribeMany(siggn, (subscribe) => {
     subscribe('ADD_TO_CART', (msg) => {
       setItems((prevItems) => {
         const existingItem = prevItems.find((item) => item.id === msg.product.id);
