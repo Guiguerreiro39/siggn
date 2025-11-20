@@ -1,5 +1,13 @@
 # @siggn/core
 
+## 0.1.1
+
+### Patch Changes
+
+- [`05b33ba`](https://github.com/Guiguerreiro39/siggn/commit/05b33ba4081ea515ea2e63a92da60f2c01d25495)
+  Thanks [@Guiguerreiro39](https://github.com/Guiguerreiro39)! - Remove GC that was causing issues
+  when subscribing to events
+
 ## 0.1.0
 
 ### Minor Changes
