@@ -1,5 +1,17 @@
 # @siggn/react
 
+## 0.1.4
+
+### Patch Changes
+
+- [`05b33ba`](https://github.com/Guiguerreiro39/siggn/commit/05b33ba4081ea515ea2e63a92da60f2c01d25495)
+  Thanks [@Guiguerreiro39](https://github.com/Guiguerreiro39)! - Remove GC that was causing issues
+  when subscribing to events
+
+- Updated dependencies
+  [[`05b33ba`](https://github.com/Guiguerreiro39/siggn/commit/05b33ba4081ea515ea2e63a92da60f2c01d25495)]:
+  - @siggn/core@0.1.1
+
 ## 0.1.3
 
 ### Patch Changes
