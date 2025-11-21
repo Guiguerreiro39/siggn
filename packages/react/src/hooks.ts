@@ -1,6 +1,5 @@
 import { type Msg, Siggn } from '@siggn/core';
 
-
 import { useEffect, useMemo, useState, type DependencyList } from 'react';
 
 /**
