@@ -1,5 +1,6 @@
 import { type Msg, Siggn } from '@siggn/core';
 import type { SubscriptionOptions } from 'packages/react/src/types';
+
 import { useEffect, useMemo, useState, type DependencyList } from 'react';
 
 /**
@@ -136,9 +137,9 @@ export function useSubscribe<M extends Msg, T extends M['type']>(
  * }
  * ```
  */
-export function useSubscribeAll<T extends Msg>(
-  options: SubscriptionOptions<T>,
-  callback: (msg: T) => void,
+export function useSubscribeAll<M extends Msg>(
+  options: SubscriptionOptions<M>,
+  callback: (msg: M) => void,
   deps: DependencyList = [],
 ) {
   const instance = useMemo(
