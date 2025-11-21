@@ -1,5 +1,12 @@
 # @siggn/react
 
+## 0.1.5
+
+### Patch Changes
+
+- [`618a73f`](https://github.com/Guiguerreiro39/siggn/commit/618a73ffd727937562f24eaf29cc20e7cb4d66b4)
+  Thanks [@Guiguerreiro39](https://github.com/Guiguerreiro39)! - fix type safety
+
 ## 0.1.4
 
 ### Patch Changes
