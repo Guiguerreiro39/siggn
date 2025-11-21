@@ -16,7 +16,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       // Prevent bundling peer dependencies like React, etc.
-      external: ['react', 'react-dom'],
+      external: ['react', 'react-dom', '@siggn/core'],
       output: {
         globals: {
           react: 'React',
