@@ -1,5 +1,13 @@
 # @siggn/core
 
+## 0.2.0
+
+### Minor Changes
+
+- [#7](https://github.com/Guiguerreiro39/siggn/pull/7)
+  [`67ce545`](https://github.com/Guiguerreiro39/siggn/commit/67ce54500a24cc989e96e4397777cfd2c64eee45)
+  Thanks [@Guiguerreiro39](https://github.com/Guiguerreiro39)! - Introduce global middleware
+
 ## 0.1.1
 
 ### Patch Changes
