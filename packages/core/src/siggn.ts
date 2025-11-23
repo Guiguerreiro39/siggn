@@ -22,6 +22,32 @@ export class Siggn<M extends Msg> {
     this.middlewares = [];
   }
 
+  /**
+   * Registers a middleware function that intercepts messages before they are delivered
+   * to subscribers. Middlewares are executed in the order they are registered.
+   *
+   * @param mw The middleware function to register.
+   * @returns A function to unregister the middleware.
+   * @category Middleware
+   * @since 0.1.2
+   * @example
+   *
+   * ```typescript
+   * const siggn = new Siggn<{ type: 'event' }>();
+   *
+   * // Log all messages
+   * const unsubscribe = siggn.use((msg, next) => {
+   *   console.log('Middleware received:', msg);
+   *   next();
+   * });
+   *
+   * // Async middleware
+   * siggn.use(async (msg, next) => {
+   *   await checkPermissions(msg);
+   *   next();
+   * });
+   * ```
+   */
   use(mw: Middleware<M>) {
     this.middlewares.push(mw);
     return () => {

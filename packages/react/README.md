@@ -166,6 +166,24 @@ function LocalComponent() {
 }
 ```
 
+### Using Middleware
+
+You can use the `useMiddleware` hook to register middleware for a `Siggn` instance. The middleware intercepts messages before they are delivered to subscribers and is automatically unregistered when the component unmounts.
+
+```tsx
+import { useMiddleware } from '@siggn/react';
+import { siggn } from '../siggn';
+
+function LoggerComponent() {
+  useMiddleware(siggn, (msg, next) => {
+    console.log('Middleware:', msg);
+    next();
+  });
+
+  return null;
+}
+```
+
 ## API
 
 ### `useSiggn<T>()`
@@ -176,12 +194,21 @@ Creates and returns a `Siggn` instance that persists for the lifetime of the com
 
 Returns a `Siggn<T>` instance.
 
-### `useSubscribe(options, setup, deps)`
+### `useSubscribe(options, type, callback, deps)`
 
-Subscribes to messages and automatically unsubscribes when the component unmounts.
+Subscribes to a single message type and automatically unsubscribes when the component unmounts.
 
 - `options`: A `Siggn` instance or an object `{ instance: Siggn<T>; id?: string; }`.
-- `setup`: A function that receives a `subscribe` helper to define subscriptions, similar to `subscribeMany` in `@siggn/core`.
+- `type`: The message type to subscribe to.
+- `callback`: The function to call when the message is received.
+- `deps` (optional): A dependency array to control when the subscription is re-created.
+
+### `useSubscribeMany(options, setup, deps)`
+
+Subscribes to multiple message types and automatically unsubscribes when the component unmounts.
+
+- `options`: A `Siggn` instance or an object `{ instance: Siggn<T>; id?: string; }`.
+- `setup`: A function that receives a `subscribe` helper to define subscriptions.
 - `deps` (optional): A dependency array to control when the subscriptions are re-created.
 
 ### `useSubscribeAll(options, callback, deps)`
@@ -189,8 +216,15 @@ Subscribes to messages and automatically unsubscribes when the component unmount
 Subscribes to all messages and automatically unsubscribes when the component unmounts.
 
 - `options`: A `Siggn` instance or an object `{ instance: Siggn<T>; id?: string; }`.
-- `callback`: A function that will be called with every message.
 - `deps` (optional): A dependency array to control when the subscriptions are re-created.
+
+### `useMiddleware(instance, middleware, deps)`
+
+Registers a middleware and automatically unregisters it when the component unmounts.
+
+- `instance`: A `Siggn` instance.
+- `middleware`: The middleware function.
+- `deps` (optional): A dependency array to control when the middleware is re-registered.
 
 ## License
 
