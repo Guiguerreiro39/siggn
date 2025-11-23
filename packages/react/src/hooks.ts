@@ -1,4 +1,5 @@
-import { type Msg, Siggn } from '@siggn/core';
+import { type Middleware, type Msg, Siggn } from '@siggn/core';
+import type { SubscriptionOptions } from 'packages/react/src/types';
 
 import { useEffect, useMemo, useState, type DependencyList } from 'react';
 
@@ -48,7 +49,7 @@ export function useSiggn<T extends Msg>(): Siggn<T> {
  * ```
  */
 export function useSubscribeMany<M extends Msg>(
-  options: Siggn<M> | { instance: Siggn<M>; id?: string },
+  options: SubscriptionOptions<M>,
   setup: (
     subscribe: <T extends M['type']>(
       type: T,
@@ -92,8 +93,8 @@ export function useSubscribeMany<M extends Msg>(
  * }
  * ```
  */
-export function useSubscribe<M extends Msg, T extends string>(
-  options: Siggn<M> | { instance: Siggn<M>; id?: string },
+export function useSubscribe<M extends Msg, T extends M['type']>(
+  options: SubscriptionOptions<M>,
   type: T,
   callback: (msg: Extract<M, { type: T }>) => void,
   deps: DependencyList = [],
@@ -136,9 +137,9 @@ export function useSubscribe<M extends Msg, T extends string>(
  * }
  * ```
  */
-export function useSubscribeAll<T extends Msg>(
-  options: Siggn<T> | { instance: Siggn<T>; id?: string },
-  callback: (msg: T) => void,
+export function useSubscribeAll<M extends Msg>(
+  options: SubscriptionOptions<M>,
+  callback: (msg: M) => void,
   deps: DependencyList = [],
 ) {
   const instance = useMemo(
@@ -154,4 +155,39 @@ export function useSubscribeAll<T extends Msg>(
       instance.unsubscribeGlobal(id);
     };
   }, [instance, id, ...deps]);
+}
+
+/**
+ * Adds a middleware to a `Siggn` instance that persists for the lifetime of the component.
+ * Automatically removes the middleware when the component unmounts.
+ *
+ * @template M A union of all possible message types.
+ * @param options A `Siggn` instance or an object with the instance.
+ * @param middleware The middleware function to add.
+ * @param deps An optional dependency array to control when the middleware is re-added.
+ * @category Middleware
+ * @since 0.0.6
+ * @example
+ *
+ * ```tsx
+ *  import { siggn } from './siggn';
+ *
+ *  function LoggerComponent() {
+ *    useMiddleware(siggn, async (msg, next) => {
+ *      console.log('Middleware:', msg);
+ *      next();
+ *    }, []);
+ *    // ...
+ *  }
+ * ```
+ */
+export function useMiddleware<M extends Msg>(
+  instance: Siggn<M>,
+  middleware: Middleware<M>,
+  deps: React.DependencyList = [],
+) {
+  useEffect(() => {
+    const cleanup = instance.use(middleware);
+    return cleanup;
+  }, [instance, middleware, ...deps]);
 }

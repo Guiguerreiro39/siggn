@@ -22,8 +22,37 @@ export class Siggn<M extends Msg> {
     this.middlewares = [];
   }
 
+  /**
+   * Registers a middleware function that intercepts messages before they are delivered
+   * to subscribers. Middlewares are executed in the order they are registered.
+   *
+   * @param mw The middleware function to register.
+   * @returns A function to unregister the middleware.
+   * @category Middleware
+   * @since 0.1.2
+   * @example
+   *
+   * ```typescript
+   * const siggn = new Siggn<{ type: 'event' }>();
+   *
+   * // Log all messages
+   * const unsubscribe = siggn.use((msg, next) => {
+   *   console.log('Middleware received:', msg);
+   *   next();
+   * });
+   *
+   * // Async middleware
+   * siggn.use(async (msg, next) => {
+   *   await checkPermissions(msg);
+   *   next();
+   * });
+   * ```
+   */
   use(mw: Middleware<M>) {
     this.middlewares.push(mw);
+    return () => {
+      this.middlewares = this.middlewares.filter((m) => m !== mw);
+    };
   }
 
   /**
@@ -196,20 +225,43 @@ export class Siggn<M extends Msg> {
   }
 
   /**
-   * Publishes a message to all relevant subscribers.
+   * Runs through all middlewares and then delivers the message to all subscribers.
    *
    * @param msg The message to publish.
    * @category Publishing
    * @since 0.0.5
    * @example
    * 
-```typescript
- * const siggn = new Siggn<{ type: 'my-event' }>();
- * siggn.subscribe('sub-1', 'my-event', () => console.log('received'));
- * siggn.publish({ type: 'my-event' }); // "received"
- * ```
+  ```typescript
+  * const siggn = new Siggn<{ type: 'my-event' }>();
+  * siggn.subscribe('sub-1', 'my-event', () => console.log('received'));
+  * siggn.publish({ type: 'my-event' }); // "received"
+  * ```
    */
-  publish(msg: M) {
+  async publish(msg: M) {
+    const run = async (i: number): Promise<void> => {
+      const mw = this.middlewares[i];
+
+      if (mw) {
+        await mw(msg, () => run(i + 1));
+        return;
+      }
+
+      this.deliverMessage(msg);
+    };
+
+    await run(0);
+  }
+
+  /**
+   * Publishes a message to all relevant subscribers.
+   *
+   * @param msg The message to publish.
+   * @category Publishing
+   * @since 0.0.5
+   *
+   */
+  private deliverMessage(msg: M) {
     this.globalSubscriptions.forEach((sub) => {
       sub.ref(msg as Extract<M, { type: any }>);
     });

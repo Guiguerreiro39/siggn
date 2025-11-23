@@ -168,6 +168,28 @@ Siggn is designed to prevent memory leaks even if subscriptions are not explicit
 
 While explicit `unsubscribe` calls are still good practice for immediate cleanup and control, Siggn provides a robust safety net against common memory leak scenarios.
 
+### Middleware
+
+You can use middleware to intercept messages before they are delivered to subscribers. This is useful for logging, validation, or modifying messages.
+
+```typescript
+const siggn = new Siggn<Message>();
+
+// Register a middleware
+const unsubscribeMiddleware = siggn.use(async (msg, next) => {
+  console.log('Middleware received:', msg);
+  
+  // You can perform async operations
+  await someAsyncCheck(msg);
+  
+  // Call next() to proceed to the next middleware or deliver the message
+  next();
+});
+
+// Unregister the middleware when no longer needed
+unsubscribeMiddleware();
+```
+
 ## API
 
 ### `new Siggn<T>()`
@@ -227,6 +249,13 @@ Subscribes to multiple message types for a single ID.
 Creates a new, independent `Siggn` instance that inherits the parent's message types and adds new ones.
 
 - `C`: A union type of additional message types for the new instance.
+
+### `use(middleware)`
+
+Registers a middleware function.
+
+- `middleware`: A function `(msg, next) => void | Promise<void>`.
+- Returns: A function to unregister the middleware.
 
 ### `subscriptionsCount()`
 

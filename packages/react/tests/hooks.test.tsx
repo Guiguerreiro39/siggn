@@ -1,5 +1,11 @@
 import { test, expect, describe, beforeEach, afterEach, vi } from 'vitest';
-import { useSiggn, useSubscribe, useSubscribeAll, useSubscribeMany } from '../src/hooks.js';
+import {
+  useMiddleware,
+  useSiggn,
+  useSubscribe,
+  useSubscribeAll,
+  useSubscribeMany,
+} from '../src/hooks.js';
 import type { Siggn } from '@siggn/core';
 import { act, render, renderHook, screen, cleanup } from '@testing-library/react';
 import { useState } from 'react';
@@ -298,5 +304,31 @@ describe('@siggn/react', () => {
       siggn.publish({ type: 'increment_count', value: 2 });
     });
     expect(callback).toHaveBeenCalledTimes(1); // Should not be called again
+  });
+
+  test('useMiddleware should add middleware and remove it on unmount', async () => {
+    const events: string[] = [];
+
+    const { unmount } = renderHook(() =>
+      useMiddleware(siggn, async (_msg, next) => {
+        events.push('middleware');
+        next();
+      }),
+    );
+
+    siggn.subscribe('1', 'custom_event', (msg) => {
+      events.push(msg.data);
+    });
+
+    siggn.publish({ type: 'custom_event', data: 'handler' });
+    expect(events).toEqual(['middleware', 'handler']);
+
+    // Clear events
+    events.length = 0;
+
+    unmount();
+
+    siggn.publish({ type: 'custom_event', data: 'handler' });
+    expect(events).toEqual(['handler']);
   });
 });

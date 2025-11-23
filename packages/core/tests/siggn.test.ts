@@ -219,8 +219,72 @@ describe('Basic usage', () => {
   });
 });
 
-// describe('Middleware', () => {
-//   test('use global middleware', () => {
-//     const siggn = new Siggn<Msg>();
-//   })
-// })
+describe('Middleware', () => {
+  test('use global middleware', async () => {
+    const siggn = new Siggn<Msg>();
+    const events: string[] = [];
+    let count = 0;
+
+    siggn.use(async (msg, next) => {
+      events.push(`middleware 1: ${msg.type}`);
+      next();
+    });
+
+    siggn.subscribe('1', 'increment_count', () => {
+      count += 1;
+    });
+
+    await siggn.publish({ type: 'increment_count', value: 1 });
+
+    expect(events).toEqual(['middleware 1: increment_count']);
+    expect(count).toBe(1);
+  });
+
+  test('middleware cleanup', async () => {
+    const siggn = new Siggn<Msg>();
+    const events: string[] = [];
+
+    const cleanup = siggn.use(async (msg, next) => {
+      events.push('middleware');
+      next();
+    });
+
+    await siggn.publish({ type: 'increment_count', value: 1 });
+    expect(events).toEqual(['middleware']);
+
+    cleanup();
+    await siggn.publish({ type: 'increment_count', value: 1 });
+    expect(events).toEqual(['middleware']);
+  });
+
+  test('middleware fail', async () => {
+    const siggn = new Siggn<Msg>();
+    const events: string[] = [];
+    let count = 0;
+
+    siggn.use(async (msg, next) => {
+      if (msg.type === 'decrement_count') {
+        return;
+      }
+
+      events.push('middleware');
+      next();
+    });
+
+    siggn.subscribe('1', 'increment_count', (msg) => {
+      count += msg.value;
+    });
+
+    siggn.subscribe('1', 'decrement_count', (msg) => {
+      count -= msg.value;
+    });
+
+    await siggn.publish({ type: 'increment_count', value: 1 });
+    expect(events).toEqual(['middleware']);
+    expect(count).toBe(1);
+
+    await siggn.publish({ type: 'decrement_count', value: 1 });
+    expect(events).toEqual(['middleware']);
+    expect(count).toBe(1);
+  });
+});

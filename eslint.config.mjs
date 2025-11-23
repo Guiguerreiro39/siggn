@@ -9,6 +9,7 @@ import simpleImportSort from "eslint-plugin-simple-import-sort";
 import sortDestructureKeys from "eslint-plugin-sort-destructure-keys";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import eslintConfigPrettier from "eslint-config-prettier";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -122,4 +123,5 @@ export default [
       "no-console": "error",
     },
   },
+  eslintConfigPrettier,
 ];
