@@ -1,5 +1,5 @@
 import { type Middleware, type Msg, Siggn } from '@siggn/core';
-import type { SubscriptionOptions } from 'packages/react/src/types';
+import type { SubscriptionOptions } from './types';
 
 import { useEffect, useMemo, useState, type DependencyList } from 'react';
 
