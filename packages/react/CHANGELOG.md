@@ -1,5 +1,12 @@
 # @siggn/react
 
+## 0.2.1
+
+### Patch Changes
+
+- [`ec891f6`](https://github.com/Guiguerreiro39/siggn/commit/ec891f6992113f5aad051e828485366c444616ca)
+  Thanks [@Guiguerreiro39](https://github.com/Guiguerreiro39)! - fix type issues
+
 ## 0.2.0
 
 ### Minor Changes
